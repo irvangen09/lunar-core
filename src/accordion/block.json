@@ -12,6 +12,7 @@
 		"anchor": true
 	},
 	"editorScript": "file:./index.js",
+	"viewScript": "file:./view.js",
 	"style": "file:./style-index.css",
 	"editorStyle": "file:./index.css"
 }

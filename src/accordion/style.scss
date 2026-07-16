@@ -71,7 +71,11 @@
 	font-size: 0.95rem;
 }
 
-/* ===== Desktop: tampil flat, selalu terbuka, non-interaktif ===== */
+/* ===== Desktop: tampil flat, non-interaktif =====
+ * Status "terbuka" sungguhan sekarang diatur oleh view.js (attribute
+ * "open" asli), bukan trik CSS — jadi di sini cukup styling visual saja
+ * (sembunyikan chevron, matikan interaksi klik).
+ */
 @media ( min-width: 768px ) {
 	.lunar-accordion-item__summary {
 		cursor: default;
@@ -80,10 +84,6 @@
 
 	.lunar-accordion-item__summary::after {
 		content: none;
-	}
-
-	.lunar-accordion-item > .lunar-accordion-item__content {
-		display: block !important;
 	}
 }
 
