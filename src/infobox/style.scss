@@ -18,16 +18,36 @@
 	font-family: var( --font-body, inherit );
 }
 
+.lunar-infobox__media {
+	overflow: hidden;
+	text-align: center;
+}
+
 .lunar-infobox__media img {
 	display: block;
 	width: 100%;
-	aspect-ratio: 4 / 3;
-	object-fit: cover;
+	height: auto;
+	max-height: 420px;
+	object-fit: contain;
+	margin: 0 auto;
+}
+
+.lunar-infobox__header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	padding: 14px 16px 8px;
+}
+
+.lunar-infobox__icon {
+	flex-shrink: 0;
+	font-size: 1.1em;
+	color: var( --color-accent, #b2512e );
 }
 
 .lunar-infobox__name {
 	margin: 0;
-	padding: 14px 16px 8px;
 
 	font-family: var( --font-display, serif );
 	font-size: 1.25rem;

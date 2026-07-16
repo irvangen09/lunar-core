@@ -16,9 +16,10 @@
 .lunar-infobox__media-preview img {
 	display: block;
 	width: 100%;
-	aspect-ratio: 4 / 3;
-	object-fit: cover;
-	margin-bottom: 8px;
+	height: auto;
+	max-height: 400px;
+	object-fit: contain;
+	margin: 0 0 8px;
 	border-radius: var( --radius-inline, 4px );
 }
 
