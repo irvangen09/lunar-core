@@ -1,11 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "lunar-core/accordion",
-	"title": "Lunar Accordion",
+	"name": "lunar-core/tabs",
+	"title": "Lunar Tabs",
 	"category": "lunar-blocks",
-	"description": "Sekumpulan section yang bisa dibuka/tutup di mobile, tampil penuh (flat) di desktop.",
-	"keywords": [ "accordion", "toggle", "section" ],
+	"description": "Sekumpulan konten paralel yang dipilih lewat menu tab horizontal.",
+	"keywords": [ "tabs", "tab", "menu" ],
 	"textdomain": "lunar-core",
 	"supports": {
 		"html": false,

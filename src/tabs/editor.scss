@@ -1,0 +1,21 @@
+/**
+ * Lokasi: lunar-core/src/tabs/editor.scss
+ * Styling khusus Block Editor untuk Tabs & Tab Item.
+ *
+ * Karena di editor semua Tab Item tampil berurutan (bukan UI tab
+ * sungguhan — lihat catatan di edit.js), border dashed di sini
+ * membantu penulis membedakan batas antar Tab Item secara visual.
+ */
+
+.lunar-tabs-item {
+	padding: 10px 4px;
+	margin-bottom: 12px;
+
+	border: 1px dashed var( --color-border, #d9cbaa );
+	border-radius: var( --radius-card, 8px );
+}
+
+.lunar-tabs-item__label[ data-rich-text-placeholder ]::before {
+	color: var( --color-text-muted, #6b5d46 );
+	opacity: 0.75;
+}

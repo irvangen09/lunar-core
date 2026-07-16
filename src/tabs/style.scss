@@ -1,0 +1,88 @@
+/**
+ * Lokasi: lunar-core/src/tabs/style.scss
+ * Styling frontend Tabs (parent) & Tab Item (child).
+ *
+ * Dua "mode" tampilan dijelaskan di sini:
+ * 1. SEBELUM JS jalan — label tampil sebagai teks penanda biasa
+ *    di atas tiap panel (semua panel terlihat, berurutan).
+ * 2. SETELAH JS jalan (.lunar-tabs--enhanced) — label sudah
+ *    dipindah jadi strip tab horizontal oleh view.js.
+ */
+
+.lunar-tabs {
+	margin: 1.25em 0;
+}
+
+/* ===== Mode 1: sebelum JS jalan ===== */
+.lunar-tabs-item {
+	margin-bottom: 1em;
+}
+
+.lunar-tabs-item__label {
+	margin-bottom: 6px;
+
+	font-family: var( --font-display, serif );
+	font-size: 1rem;
+	font-weight: 600;
+	color: var( --color-text, #2b2015 );
+}
+
+.lunar-tabs-item__content {
+	font-size: 0.95rem;
+}
+
+/* ===== Mode 2: setelah JS jalan ===== */
+.lunar-tabs--enhanced .lunar-tabs-item {
+	margin-bottom: 0;
+}
+
+.lunar-tabs__list {
+	display: flex;
+	gap: 4px;
+	overflow-x: auto;
+	scrollbar-width: thin;
+
+	margin-bottom: 16px;
+	border-bottom: 1px solid var( --color-border, #d9cbaa );
+}
+
+.lunar-tabs__tab {
+	flex-shrink: 0;
+	cursor: pointer;
+
+	padding: 10px 16px;
+	margin-bottom: -1px;
+	border-bottom: 2px solid transparent;
+
+	font-family: var( --font-display, serif );
+	font-size: 0.92rem;
+	font-weight: 600;
+	white-space: nowrap;
+	color: var( --color-text-muted, #6b5d46 );
+
+	transition: color 0.15s ease, border-color 0.15s ease;
+
+	&:hover {
+		color: var( --color-text, #2b2015 );
+	}
+
+	&[ aria-selected='true' ] {
+		color: var( --color-accent, #b2512e );
+		border-bottom-color: var( --color-accent, #b2512e );
+	}
+
+	&:focus-visible {
+		outline: 2px solid var( --color-accent, #b2512e );
+		outline-offset: 2px;
+	}
+}
+
+.lunar-tabs__panel {
+	font-size: 0.95rem;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.lunar-tabs__tab {
+		transition: none;
+	}
+}
