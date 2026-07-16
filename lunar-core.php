@@ -15,6 +15,7 @@ namespace Lunar\Core;
 
 use Lunar\Blocks\Registry as Block_Registry;
 use Lunar\Blocks\Categories as Block_Categories;
+use Lunar\Blocks\Formats as Block_Formats;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Cegah akses langsung.
@@ -63,5 +64,8 @@ function bootstrap(): void {
 
 	$block_categories = new Block_Categories();
 	$block_categories->init();
+
+	$block_formats = new Block_Formats( LUNAR_CORE_PATH . 'build', LUNAR_CORE_URL . 'build' );
+	$block_formats->init();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap' );
