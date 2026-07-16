@@ -13,6 +13,15 @@
 			"source": "rich-text",
 			"selector": ".lunar-infobox__name"
 		},
+		"headingLevel": {
+			"type": "string",
+			"enum": [ "none", "h2", "h3", "h4", "h5", "h6" ],
+			"default": "h2"
+		},
+		"icon": {
+			"type": "string",
+			"default": ""
+		},
 		"imageId": {
 			"type": "number",
 			"default": 0

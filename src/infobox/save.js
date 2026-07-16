@@ -6,7 +6,7 @@
 import { useBlockProps, useInnerBlocksProps, RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { name, imageUrl, imageAlt } = attributes;
+	const { name, headingLevel, icon, imageUrl, imageAlt } = attributes;
 
 	const blockProps = useBlockProps.save( {
 		className: 'lunar-infobox',
@@ -16,6 +16,11 @@ export default function save( { attributes } ) {
 		className: 'lunar-infobox__fields',
 	} );
 
+	const nameTagName = 'none' === headingLevel ? 'p' : headingLevel;
+
+	// Sama seperti edit.js — deteksi otomatis dashicons butuh class dasar tambahan.
+	const iconClassName = icon && icon.startsWith( 'dashicons-' ) ? `dashicons ${ icon }` : icon;
+
 	return (
 		<div { ...blockProps }>
 			{ imageUrl && (
@@ -24,7 +29,10 @@ export default function save( { attributes } ) {
 				</div>
 			) }
 
-			<RichText.Content tagName="p" className="lunar-infobox__name" value={ name } />
+			<div className="lunar-infobox__header">
+				{ icon && <span className={ `lunar-infobox__icon ${ iconClassName }` } aria-hidden="true" /> }
+				<RichText.Content tagName={ nameTagName } className="lunar-infobox__name" value={ name } />
+			</div>
 
 			<div { ...innerBlocksProps } />
 		</div>
