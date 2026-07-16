@@ -1,0 +1,13 @@
+{
+	"name": "lunar-core",
+	"version": "0.1.0",
+	"description": "Gutenberg Block & data layer untuk LunarThemes.",
+	"private": true,
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^30.0.0"
+	}
+}

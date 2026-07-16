@@ -1,0 +1,15 @@
+/**
+ * Lokasi: lunar-core/src/callout/editor.scss
+ * Styling khusus Block Editor untuk block Callout.
+ *
+ * Catatan: style.scss (frontend) tetap ikut dimuat di editor oleh WordPress,
+ * jadi file ini HANYA berisi penyesuaian yang memang spesifik untuk
+ * konteks editor — bukan duplikasi styling frontend.
+ */
+
+.lunar-callout {
+	.lunar-callout__text[data-rich-text-placeholder]::before {
+		color: var( --color-text-muted, #6b5d46 );
+		opacity: 0.75;
+	}
+}
