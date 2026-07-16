@@ -42,6 +42,26 @@ class Registry {
 	 */
 	public function init(): void {
 		add_action( 'init', array( $this, 'register_blocks' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_dashicons' ) );
+	}
+
+	/**
+	 * Dashicons TIDAK dimuat otomatis di frontend oleh WordPress
+	 * (hanya tersedia bawaan di wp-admin/editor). Infobox mendukung
+	 * field "icon" bebas isi nama class apa pun, dan dashicons adalah
+	 * opsi paling native/mudah dipakai (tanpa dependency eksternal) —
+	 * tanpa ini, class dashicons-* akan tampil sebagai kotak kosong
+	 * ("tofu") di frontend karena font-nya tidak ter-load.
+	 *
+	 * Dimuat KONDISIONAL, hanya saat halaman benar-benar memakai
+	 * block Infobox (ARCHITECTURE.md §14, Conditional Asset Loading).
+	 * Icon dari library lain (mis. Font Awesome) tetap jadi tanggung
+	 * jawab tema/situs sendiri untuk memuat font/library-nya.
+	 */
+	public function maybe_enqueue_dashicons(): void {
+		if ( is_singular() && has_block( 'lunar-core/infobox' ) ) {
+			wp_enqueue_style( 'dashicons' );
+		}
 	}
 
 	/**
