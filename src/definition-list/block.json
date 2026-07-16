@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/definition-list",
+	"title": "Lunar Definition List",
+	"category": "lunar-blocks",
+	"description": "Menampilkan pasangan istilah dan definisi secara terstruktur dan semantik.",
+	"keywords": [ "definisi", "istilah", "glosarium" ],
+	"textdomain": "lunar-core",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css"
+}

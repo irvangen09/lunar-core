@@ -45,35 +45,29 @@ class Registry {
 	}
 
 	/**
-	 * Memindai folder build/ dan mendaftarkan tiap block yang ditemukan.
+	 * Memindai folder build/ secara REKURSIF dan mendaftarkan tiap block
+	 * yang ditemukan — termasuk block anak di dalam sub-folder
+	 * (mis. build/definition-list/item/block.json untuk pola parent-child).
+	 *
+	 * Revisi dari versi awal yang hanya memindai satu level folder;
+	 * direvisi karena beberapa block (Definition List, Accordion, dst)
+	 * memakai struktur parent-child sesuai BLOCK_DEVELOPMENT_GUIDE.md §4.
+	 * Disetujui Product Owner sebagai penyesuaian teknis yang diperlukan
+	 * (CODING_STANDARD.md §20).
 	 */
 	public function register_blocks(): void {
 		if ( ! is_dir( $this->build_path ) ) {
 			return;
 		}
 
-		$block_folders = glob( $this->build_path . '/*', GLOB_ONLYDIR );
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator( $this->build_path, \FilesystemIterator::SKIP_DOTS )
+		);
 
-		if ( empty( $block_folders ) ) {
-			return;
+		foreach ( $iterator as $file ) {
+			if ( 'block.json' === $file->getFilename() ) {
+				register_block_type( $file->getPath() );
+			}
 		}
-
-		foreach ( $block_folders as $folder ) {
-			$this->register_single_block( $folder );
-		}
-	}
-
-	/**
-	 * Mendaftarkan satu block dari folder build-nya.
-	 * Fail gracefully bila block.json tidak ditemukan (BLOCK_DEVELOPMENT_GUIDE.md §18).
-	 *
-	 * @param string $folder Path folder build satu block.
-	 */
-	private function register_single_block( string $folder ): void {
-		if ( ! file_exists( $folder . '/block.json' ) ) {
-			return;
-		}
-
-		register_block_type( $folder );
 	}
 }

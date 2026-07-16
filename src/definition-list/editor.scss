@@ -1,0 +1,19 @@
+/**
+ * Lokasi: lunar-core/src/definition-list/editor.scss
+ * Styling khusus Block Editor untuk Definition List & Definition Item.
+ *
+ * style.scss (frontend) tetap ikut dimuat di editor oleh WordPress,
+ * jadi file ini hanya berisi penyesuaian yang memang spesifik konteks editor.
+ */
+
+.lunar-definition-item {
+	// Beri jarak yang cukup di editor supaya toolbar block anak
+	// (drag handle, tombol hapus) tidak berhimpitan dengan teks.
+	padding-block: 2px;
+
+	&__term[data-rich-text-placeholder]::before,
+	&__definition[data-rich-text-placeholder]::before {
+		color: var( --color-text-muted, #6b5d46 );
+		opacity: 0.75;
+	}
+}
