@@ -1,0 +1,65 @@
+/**
+ * Lokasi: lunar-core/src/infobox/style.scss
+ * Styling frontend untuk Infobox (parent) & Infobox Field (child).
+ *
+ * Catatan: posisi float-kanan + sticky adalah tanggung jawab Theme
+ * (Fase 4), BUKAN di sini — lihat Dokumen-Perencanaan-LunarThemes.md §3.3.
+ * File ini hanya mengatur tampilan "kartu"-nya sendiri.
+ */
+
+.lunar-infobox {
+	max-width: 320px;
+
+	background: var( --color-surface, #fbf8f0 );
+	border: 1px solid var( --color-border, #d9cbaa );
+	border-radius: var( --radius-card, 8px );
+	overflow: hidden;
+
+	font-family: var( --font-body, inherit );
+}
+
+.lunar-infobox__media img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+}
+
+.lunar-infobox__name {
+	margin: 0;
+	padding: 14px 16px 8px;
+
+	font-family: var( --font-display, serif );
+	font-size: 1.25rem;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.lunar-infobox__fields {
+	border-top: 1px solid var( --color-border, #d9cbaa );
+}
+
+.lunar-infobox-field {
+	display: grid;
+	grid-template-columns: 40% 1fr;
+
+	border-top: 1px solid var( --color-border, #d9cbaa );
+
+	&:first-child {
+		border-top: none;
+	}
+}
+
+.lunar-infobox-field__label {
+	padding: 8px 14px;
+
+	background: var( --color-surface-2, #f7f1e4 );
+	color: var( --color-text-muted, #6b5d46 );
+	font-weight: 600;
+	font-size: 0.82rem;
+}
+
+.lunar-infobox-field__value {
+	padding: 8px 14px;
+	font-size: 0.88rem;
+}

@@ -16,6 +16,8 @@ namespace Lunar\Core;
 use Lunar\Blocks\Registry as Block_Registry;
 use Lunar\Blocks\Categories as Block_Categories;
 use Lunar\Blocks\Formats as Block_Formats;
+use Lunar\Content\Meta_Fields;
+use Lunar\Content\Meta_Sync;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Cegah akses langsung.
@@ -26,17 +28,21 @@ define( 'LUNAR_CORE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LUNAR_CORE_URL', plugin_dir_url( __FILE__ ) );
 
 /**
- * Autoloader sederhana untuk namespace Lunar\.
+ * Autoloader sederhana untuk seluruh namespace Lunar\.
  *
  * Tidak memakai Composer — dihindari sebagai dependency yang tidak
  * diperlukan untuk kebutuhan sesederhana ini (ARCHITECTURE.md §19,
  * Dependency Policy). Mengikuti konvensi penamaan file WordPress:
  * class Foo\Bar\Baz_Qux -> includes/Bar/class-baz-qux.php
  *
+ * Digeneralisasi (sebelumnya hanya mengenali Lunar\Core\ dan Lunar\Blocks\)
+ * supaya namespace baru (Lunar\Content, Lunar\Services, dst — sesuai
+ * BLUEPRINT.md §12) otomatis ter-autoload tanpa perlu revisi file ini lagi.
+ *
  * @param string $class_name Nama class lengkap dengan namespace.
  */
 function autoload( string $class_name ): void {
-	if ( ! str_starts_with( $class_name, __NAMESPACE__ . '\\' ) && ! str_starts_with( $class_name, 'Lunar\\Blocks\\' ) ) {
+	if ( ! str_starts_with( $class_name, 'Lunar\\' ) ) {
 		return;
 	}
 
@@ -67,5 +73,11 @@ function bootstrap(): void {
 
 	$block_formats = new Block_Formats( LUNAR_CORE_PATH . 'build', LUNAR_CORE_URL . 'build' );
 	$block_formats->init();
+
+	$meta_fields = new Meta_Fields();
+	$meta_fields->init();
+
+	$meta_sync = new Meta_Sync();
+	$meta_sync->init();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap' );

@@ -1,0 +1,34 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/infobox-field",
+	"title": "Lunar Infobox Field",
+	"category": "lunar-blocks",
+	"description": "Satu baris data di dalam Infobox — bisa berupa field bebas (label manual) atau field dikenali (otomatis tersinkron ke post meta untuk filter).",
+	"parent": [ "lunar-core/infobox" ],
+	"textdomain": "lunar-core",
+	"attributes": {
+		"mode": {
+			"type": "string",
+			"enum": [ "bebas", "dikenali" ],
+			"default": "bebas"
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"recognizedField": {
+			"type": "string",
+			"default": ""
+		},
+		"value": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": ".lunar-infobox-field__value"
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false
+	}
+}

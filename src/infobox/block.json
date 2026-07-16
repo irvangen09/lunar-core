@@ -1,0 +1,37 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/infobox",
+	"title": "Lunar Infobox",
+	"category": "lunar-blocks",
+	"description": "Panel data terstruktur (nama, gambar, field bebas/dikenali) untuk karakter, item, lokasi, dsb.",
+	"keywords": [ "infobox", "panel", "karakter", "item" ],
+	"textdomain": "lunar-core",
+	"attributes": {
+		"name": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": ".lunar-infobox__name"
+		},
+		"imageId": {
+			"type": "number",
+			"default": 0
+		},
+		"imageUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"imageAlt": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"multiple": false,
+		"anchor": true
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css"
+}

@@ -1,0 +1,44 @@
+/**
+ * Lokasi: lunar-core/src/infobox/editor.scss
+ * Styling khusus Block Editor untuk Infobox & Infobox Field.
+ *
+ * style.scss (frontend) tetap ikut dimuat di editor oleh WordPress,
+ * file ini hanya berisi penyesuaian yang spesifik konteks editor.
+ */
+
+.lunar-infobox__media {
+	padding: 14px;
+	text-align: center;
+
+	border-bottom: 1px solid var( --color-border, #d9cbaa );
+}
+
+.lunar-infobox__media-preview img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	margin-bottom: 8px;
+	border-radius: var( --radius-inline, 4px );
+}
+
+.lunar-infobox__name[data-rich-text-placeholder]::before {
+	color: var( --color-text-muted, #6b5d46 );
+	opacity: 0.75;
+}
+
+.lunar-infobox-field {
+	// Beri jarak agar toolbar block anak (drag handle, tombol hapus)
+	// tidak berhimpitan dengan teks label/nilai.
+	padding-block: 2px;
+
+	&__label[data-rich-text-placeholder]::before,
+	&__value[data-rich-text-placeholder]::before {
+		color: var( --color-text-muted, #6b5d46 );
+		opacity: 0.75;
+	}
+
+	&__label--recognized {
+		font-style: italic;
+	}
+}
