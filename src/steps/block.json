@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/steps",
+	"title": "Lunar Steps",
+	"category": "lunar-blocks",
+	"description": "Instruksi berurutan bernomor otomatis (mis. cara upgrade alat, cara menikahi karakter).",
+	"keywords": [ "steps", "langkah", "instruksi", "tutorial" ],
+	"textdomain": "lunar-core",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css"
+}

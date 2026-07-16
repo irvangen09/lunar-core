@@ -1,0 +1,30 @@
+/**
+ * Lokasi: lunar-core/src/steps/index.js
+ * Entry point — mendaftarkan block induk (Steps) sekaligus
+ * block anak (Step).
+ */
+
+import { registerBlockType } from '@wordpress/blocks';
+
+import stepsMetadata from './block.json';
+import StepsEdit from './edit';
+import stepsSave from './save';
+
+import itemMetadata from './item/block.json';
+import ItemEdit from './item/edit';
+import itemSave from './item/save';
+
+import './style.scss';
+import './editor.scss';
+
+registerBlockType( stepsMetadata.name, {
+	icon: 'editor-ol',
+	edit: StepsEdit,
+	save: stepsSave,
+} );
+
+registerBlockType( itemMetadata.name, {
+	icon: 'editor-ol',
+	edit: ItemEdit,
+	save: itemSave,
+} );

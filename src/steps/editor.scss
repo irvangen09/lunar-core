@@ -1,0 +1,14 @@
+/**
+ * Lokasi: lunar-core/src/steps/editor.scss
+ * Styling khusus Block Editor untuk Steps & Step.
+ *
+ * Karena nomor & garis vertikal murni CSS counter (sama persis di
+ * editor maupun frontend, tidak ada perbedaan struktur DOM seperti
+ * Accordion/Tabs), file ini cuma perlu sedikit penyesuaian ruang agar
+ * toolbar block (drag handle) yang muncul saat hover/select tidak
+ * menutupi badge nomor.
+ */
+
+.lunar-step {
+	margin-left: 4px;
+}
