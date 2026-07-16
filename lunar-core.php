@@ -16,6 +16,7 @@ namespace Lunar\Core;
 use Lunar\Blocks\Registry as Block_Registry;
 use Lunar\Blocks\Categories as Block_Categories;
 use Lunar\Blocks\Formats as Block_Formats;
+use Lunar\Blocks\Heading_Injector;
 use Lunar\Content\Meta_Fields;
 use Lunar\Content\Meta_Sync;
 
@@ -79,5 +80,8 @@ function bootstrap(): void {
 
 	$meta_sync = new Meta_Sync();
 	$meta_sync->init();
+
+	$heading_injector = new Heading_Injector();
+	$heading_injector->init();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap' );

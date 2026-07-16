@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/toc",
+	"title": "Lunar Table of Contents",
+	"category": "lunar-blocks",
+	"description": "Daftar isi otomatis dari heading di artikel, dengan link langsung ke tiap section.",
+	"keywords": [ "toc", "daftar isi", "table of contents" ],
+	"textdomain": "lunar-core",
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": "Daftar Isi"
+		}
+	},
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css"
+}

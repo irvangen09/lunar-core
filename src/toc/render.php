@@ -1,0 +1,54 @@
+<?php
+/**
+ * Lokasi: lunar-core/src/toc/render.php
+ *
+ * Template render untuk dynamic block TOC. Variabel $attributes,
+ * $content, $block sudah otomatis tersedia (dipasok WordPress lewat
+ * field "render" di block.json).
+ *
+ * @package Lunar\Blocks
+ */
+
+use Lunar\Blocks\TOC_Builder;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Cegah akses langsung.
+}
+
+$post_id = get_the_ID();
+
+if ( ! $post_id ) {
+	return '';
+}
+
+$builder  = new TOC_Builder();
+$headings = $builder->get_headings( $post_id );
+
+// Fail gracefully — tidak ada heading sama sekali, jangan render
+// kotak "Daftar Isi" kosong yang tidak ada gunanya.
+if ( empty( $headings ) ) {
+	return '';
+}
+
+$tree      = $builder->build_tree( $headings );
+$list_html = $builder->render_tree( $tree );
+
+$title = ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Daftar Isi', 'lunar-core' );
+
+$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'lunar-toc' ) );
+?>
+<details <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput -- sudah di-escape oleh get_block_wrapper_attributes(). ?>>
+	<summary class="lunar-toc__summary">
+		<span class="lunar-toc__icon" aria-hidden="true">
+			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<line x1="4" y1="6" x2="20" y2="6"></line>
+				<line x1="4" y1="12" x2="20" y2="12"></line>
+				<line x1="4" y1="18" x2="14" y2="18"></line>
+			</svg>
+		</span>
+		<span class="lunar-toc__title"><?php echo esc_html( $title ); ?></span>
+	</summary>
+	<nav class="lunar-toc__nav" aria-label="<?php echo esc_attr( $title ); ?>">
+		<?php echo $list_html; // phpcs:ignore WordPress.Security.EscapeOutput -- sudah di-escape per elemen di render_tree(). ?>
+	</nav>
+</details>

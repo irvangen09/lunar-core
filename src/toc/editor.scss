@@ -1,0 +1,47 @@
+/**
+ * Lokasi: lunar-core/src/toc/editor.scss
+ * Styling khusus Block Editor untuk TOC — cuma untuk placeholder
+ * (lihat catatan di edit.js kenapa tidak ada live preview sungguhan).
+ */
+
+.lunar-toc {
+	padding: 14px 18px;
+
+	background: var( --color-surface, #fbf8f0 );
+	border: 1px solid var( --color-border, #d9cbaa );
+	border-radius: var( --radius-card, 8px );
+}
+
+.lunar-toc__header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.lunar-toc__icon {
+	display: flex;
+	flex-shrink: 0;
+	color: var( --color-accent, #b2512e );
+}
+
+.lunar-toc__title {
+	flex: 1;
+	width: auto;
+
+	border: none;
+	background: transparent;
+	padding: 0;
+
+	font-family: var( --font-display, serif );
+	font-size: 1rem;
+	font-weight: 600;
+	color: var( --color-text, #2b2015 );
+}
+
+.lunar-toc__placeholder-note {
+	margin: 10px 0 0;
+
+	font-size: 0.85rem;
+	font-style: italic;
+	color: var( --color-text-muted, #6b5d46 );
+}
