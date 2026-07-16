@@ -100,7 +100,7 @@ class TOC_Builder {
 				$heading_level = $block['attrs']['headingLevel'] ?? 'h2';
 
 				if ( 'none' !== $heading_level ) {
-					$text = trim( wp_strip_all_tags( $block['attrs']['title'] ?? '' ) );
+					$text = $this->extract_accordion_title( $block['innerHTML'] ?? '' );
 
 					if ( '' !== $text ) {
 						$results[] = array(
@@ -115,6 +115,26 @@ class TOC_Builder {
 				$this->collect_headings( $block['innerBlocks'], $results );
 			}
 		}
+	}
+
+	/**
+	 * Mengambil teks judul Accordion Item dari innerHTML-nya.
+	 *
+	 * Tidak bisa pakai $block['attrs']['title'] — attribute itu
+	 * bersumber dari HTML (rich-text), parse_blocks() PHP tidak
+	 * mengekstraknya ke situ (beda dari attribute polos seperti
+	 * headingLevel yang tersimpan langsung di comment block). Sama
+	 * seperti pola extract_value_text() di Meta_Sync untuk Infobox Field.
+	 *
+	 * @param string $html innerHTML block Accordion Item.
+	 * @return string
+	 */
+	private function extract_accordion_title( string $html ): string {
+		if ( preg_match( '/<h[1-6][^>]*class="[^"]*lunar-accordion-item__title[^"]*"[^>]*>(.*?)<\/h[1-6]>/s', $html, $matches ) ) {
+			return trim( wp_strip_all_tags( $matches[1] ) );
+		}
+
+		return '';
 	}
 
 	/**

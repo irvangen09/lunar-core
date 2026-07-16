@@ -127,7 +127,15 @@ class Heading_Injector {
 			return $block_content;
 		}
 
-		$text = trim( wp_strip_all_tags( $block['attrs']['title'] ?? '' ) );
+		// Tidak bisa pakai $block['attrs']['title'] — attribute itu
+		// bersumber dari HTML (rich-text), tidak tersedia di $block['attrs']
+		// lewat filter render_block_* (sama seperti masalah di TOC_Builder).
+		// Ekstrak langsung dari markup yang sudah dirender.
+		if ( ! preg_match( '/<h[1-6][^>]*class="[^"]*lunar-accordion-item__title[^"]*"[^>]*>(.*?)<\/h[1-6]>/s', $block_content, $matches ) ) {
+			return $block_content;
+		}
+
+		$text = trim( wp_strip_all_tags( $matches[1] ) );
 
 		if ( '' === $text ) {
 			return $block_content;
