@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/accordion-item",
+	"title": "Lunar Accordion Item",
+	"category": "lunar-blocks",
+	"description": "Satu section di dalam Accordion — judul (heading + icon opsional) dan konten bebas (paragraf, gambar, link, block lain).",
+	"parent": [ "lunar-core/accordion" ],
+	"textdomain": "lunar-core",
+	"attributes": {
+		"title": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": ".lunar-accordion-item__title"
+		},
+		"headingLevel": {
+			"type": "string",
+			"enum": [ "none", "h2", "h3", "h4", "h5", "h6" ],
+			"default": "h2"
+		},
+		"icon": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false
+	}
+}

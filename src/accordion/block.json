@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/accordion",
+	"title": "Lunar Accordion",
+	"category": "lunar-blocks",
+	"description": "Sekumpulan section yang bisa dibuka/tutup di mobile, tampil penuh (flat) di desktop.",
+	"keywords": [ "accordion", "toggle", "section" ],
+	"textdomain": "lunar-core",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css"
+}
