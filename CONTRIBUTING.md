@@ -59,4 +59,3 @@ Do not skip any stage. Pull requests for new blocks should indicate the current 
 ## Code of Conduct
 
 Be respectful and constructive in issue and pull request discussions. Technical disagreements are normal—criticize ideas, not people.
-```
