@@ -31,4 +31,4 @@ build/
 # dotenv environment variables file
 .env
 
-*.md
+DELIVERABLE.md
