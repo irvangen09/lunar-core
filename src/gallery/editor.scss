@@ -1,0 +1,58 @@
+/**
+ * Lokasi: lunar-core/src/gallery/editor.scss
+ * Styling khusus Block Editor untuk Gallery & Gallery Item
+ * (grid kolom via CSS Grid, mengikuti context 'lunar-core/gallery-columns').
+ */
+
+.wp-block-lunar-core-gallery {
+	display: grid;
+	grid-template-columns: repeat( var( --lunar-gallery-columns, 3 ), 1fr );
+	gap: 1rem;
+	padding: 1rem;
+	border: 1px solid var( --color-border, #d9cbaa );
+	border-radius: 5px;
+	background: var( --color-surface, #fbf8f0 );
+}
+
+.wp-block-lunar-core-gallery.lunar-gallery--columns-2 {
+	--lunar-gallery-columns: 2;
+}
+
+.wp-block-lunar-core-gallery.lunar-gallery--columns-3 {
+	--lunar-gallery-columns: 3;
+}
+
+.wp-block-lunar-core-gallery.lunar-gallery--columns-4 {
+	--lunar-gallery-columns: 4;
+}
+
+.wp-block-lunar-core-gallery-item {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+
+	figure {
+		margin: 0;
+	}
+
+	img {
+		display: block;
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		border-radius: 5px;
+		border: 1px solid var( --color-border, #d9cbaa );
+	}
+}
+
+.lunar-gallery-item__caption {
+	margin-top: 0.5rem;
+	font-family: var( --font-body, inherit );
+	font-size: 0.875rem;
+	color: var( --color-text-muted, #6b5d46 );
+	text-align: center;
+
+	&[data-rich-text-placeholder] {
+		opacity: 0.6;
+	}
+}

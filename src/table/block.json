@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/table",
+	"title": "Lunar Table",
+	"category": "lunar-blocks",
+	"description": "Tabel data dengan dukungan sort & filter, otomatis jadi tampilan card di layar mobile.",
+	"keywords": [ "table", "tabel", "data", "sort", "filter" ],
+	"textdomain": "lunar-core",
+	"attributes": {
+		"columns": {
+			"type": "array",
+			"default": []
+		},
+		"rows": {
+			"type": "array",
+			"default": []
+		},
+		"enableSort": {
+			"type": "boolean",
+			"default": true
+		},
+		"enableFilter": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"editorScript": "file:./index.js",
+	"viewScript": "file:./view.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css"
+}

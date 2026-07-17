@@ -1,0 +1,31 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/timeline-item",
+	"title": "Lunar Timeline Item",
+	"category": "lunar-blocks",
+	"description": "Satu titik/poin kronologis di dalam block Timeline — terdiri dari label, judul, dan deskripsi opsional.",
+	"parent": [ "lunar-core/timeline" ],
+	"textdomain": "lunar-core",
+	"attributes": {
+		"label": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": ".lunar-timeline-item__label"
+		},
+		"title": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": ".lunar-timeline-item__title"
+		},
+		"description": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": ".lunar-timeline-item__description"
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false
+	}
+}

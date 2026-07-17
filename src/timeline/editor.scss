@@ -1,0 +1,13 @@
+/**
+ * Lokasi: lunar-core/src/timeline/editor.scss
+ * Styling khusus Block Editor untuk Timeline & Timeline Item.
+ *
+ * style.scss (frontend) tetap ikut dimuat di editor oleh WordPress,
+ * file ini hanya berisi penyesuaian yang spesifik konteks editor.
+ */
+
+// Sedikit jarak di atas item pertama agar marker tidak terasa
+// terlalu menempel ke toolbar block saat block dipilih di Gutenberg.
+.lunar-timeline-item:first-child {
+	margin-top: 4px;
+}

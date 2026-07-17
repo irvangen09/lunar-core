@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/gallery",
+	"title": "Lunar Gallery",
+	"category": "lunar-blocks",
+	"description": "Menampilkan beberapa gambar dalam grid dengan lightbox.",
+	"keywords": [ "gallery", "galeri", "gambar", "grid", "lightbox" ],
+	"textdomain": "lunar-core",
+	"attributes": {
+		"columns": {
+			"type": "number",
+			"default": 3
+		}
+	},
+	"providesContext": {
+		"lunar-core/gallery-columns": "columns"
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": [ "wide", "full" ]
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css",
+	"viewScript": "file:./view.js"
+}

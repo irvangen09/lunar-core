@@ -1,0 +1,140 @@
+/**
+ * Lokasi: lunar-core/src/table/style.scss
+ * Styling frontend Table — tampilan table biasa di desktop,
+ * berubah jadi grid card di mobile (murni CSS, data-label sudah
+ * "dipanggang" di save.js).
+ */
+
+.lunar-table {
+	margin: 1.5em 0;
+}
+
+.lunar-table__filter {
+	margin-bottom: 12px;
+}
+
+.lunar-table__filter-input {
+	width: 100%;
+	max-width: 320px;
+	padding: 8px 14px;
+
+	background: var( --color-surface, #fbf8f0 );
+	border: 1px solid var( --color-border, #d9cbaa );
+	border-radius: 20px;
+
+	font-family: var( --font-body, inherit );
+	font-size: 0.9rem;
+	color: var( --color-text, #2b2015 );
+
+	&:focus-visible {
+		outline: 2px solid var( --color-accent, #b2512e );
+		outline-offset: 2px;
+	}
+}
+
+.lunar-table__table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.92rem;
+
+	th,
+	td {
+		padding: 10px 14px;
+		text-align: left;
+		border-bottom: 1px solid var( --color-border, #d9cbaa );
+	}
+
+	thead th {
+		background: var( --color-surface-2, #f7f1e4 );
+		font-family: var( --font-display, serif );
+		font-weight: 600;
+		color: var( --color-text, #2b2015 );
+	}
+
+	tbody tr:nth-child( even ) {
+		background: var( --color-surface, #fbf8f0 );
+	}
+}
+
+.lunar-table__sortable {
+	position: relative;
+	padding-right: 26px;
+	cursor: pointer;
+
+	&::after {
+		content: '\21C5';
+		position: absolute;
+		right: 10px;
+		font-size: 0.8em;
+		opacity: 0.4;
+	}
+
+	&[ data-sort-direction='asc' ]::after {
+		content: '\2191';
+		color: var( --color-accent, #b2512e );
+		opacity: 1;
+	}
+
+	&[ data-sort-direction='desc' ]::after {
+		content: '\2193';
+		color: var( --color-accent, #b2512e );
+		opacity: 1;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var( --color-accent, #b2512e );
+		outline-offset: -2px;
+	}
+}
+
+/* ===== Mobile: grid card, bukan tabel horizontal ===== */
+@media ( max-width: 640px ) {
+	.lunar-table__table,
+	.lunar-table__table tbody,
+	.lunar-table__table tr,
+	.lunar-table__table td {
+		display: block;
+	}
+
+	.lunar-table__table thead {
+		// Header asli disembunyikan secara aksesibel (tetap terbaca
+		// screen reader), digantikan data-label per sel.
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect( 0 0 0 0 );
+		white-space: nowrap;
+	}
+
+	.lunar-table__table tbody tr {
+		display: grid;
+		grid-template-columns: repeat( auto-fill, minmax( 130px, 1fr ) );
+		gap: 1px;
+
+		margin-bottom: 16px;
+		background: var( --color-border, #d9cbaa );
+		border: 1px solid var( --color-border, #d9cbaa );
+		border-radius: var( --radius-card, 8px );
+		overflow: hidden;
+	}
+
+	.lunar-table__table td {
+		background: var( --color-surface, #fbf8f0 );
+		padding: 8px 12px;
+		border: none;
+
+		&::before {
+			content: attr( data-label );
+			display: block;
+			margin-bottom: 2px;
+
+			font-family: var( --font-display, serif );
+			font-size: 0.7rem;
+			font-weight: 600;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+			color: var( --color-text-muted, #6b5d46 );
+		}
+	}
+}

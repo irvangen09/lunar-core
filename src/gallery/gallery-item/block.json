@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/gallery-item",
+	"title": "Lunar Gallery Item",
+	"category": "lunar-blocks",
+	"description": "Satu gambar di dalam Gallery, dengan keterangan opsional.",
+	"keywords": [ "gallery item", "gambar", "caption" ],
+	"textdomain": "lunar-core",
+	"parent": [ "lunar-core/gallery" ],
+	"attributes": {
+		"imageId": {
+			"type": "number",
+			"default": 0
+		},
+		"imageUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"imageAlt": {
+			"type": "string",
+			"default": ""
+		},
+		"caption": {
+			"type": "string",
+			"source": "html",
+			"selector": "figcaption",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false
+	},
+	"editorScript": "file:./index.js"
+}

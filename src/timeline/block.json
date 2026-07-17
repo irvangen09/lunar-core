@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lunar-core/timeline",
+	"title": "Lunar Timeline",
+	"category": "lunar-blocks",
+	"description": "Menampilkan rangkaian poin kronologis secara vertikal — fleksibel untuk riwayat versi, alur cerita, atau urutan event apa pun.",
+	"keywords": [ "timeline", "riwayat", "kronologis", "urutan" ],
+	"textdomain": "lunar-core",
+	"attributes": {},
+	"supports": {
+		"html": false,
+		"align": [ "wide" ],
+		"anchor": true
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./index.css"
+}

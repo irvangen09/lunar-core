@@ -1,0 +1,38 @@
+/**
+ * Lokasi: lunar-core/src/table/editor.scss
+ * Styling khusus Block Editor untuk UI mini-spreadsheet Table.
+ */
+
+.lunar-table-editor {
+	overflow-x: auto;
+}
+
+.lunar-table-editor__empty {
+	padding: 24px;
+	text-align: center;
+
+	background: var( --color-surface-2, #f7f1e4 );
+	border: 1px dashed var( --color-border, #d9cbaa );
+	border-radius: var( --radius-card, 8px );
+}
+
+.lunar-table-editor__toolbar {
+	margin-bottom: 10px;
+}
+
+.lunar-table-editor__grid {
+	width: 100%;
+	border-collapse: collapse;
+
+	th,
+	td {
+		min-width: 140px;
+		padding: 6px;
+		vertical-align: top;
+		border: 1px solid var( --color-border, #d9cbaa );
+	}
+
+	th {
+		background: var( --color-surface-2, #f7f1e4 );
+	}
+}
