@@ -4,7 +4,7 @@
  *
  * Plugin Name:       Lunar Core
  * Description:       Plugin pendamping LunarThemes — menangani data, Custom Post Type, Taxonomy, dan Gutenberg Block untuk dokumentasi wiki game.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires PHP:      8.0
  * Text Domain:       lunar-core
  *
@@ -20,6 +20,7 @@ use Lunar\Blocks\Heading_Injector;
 use Lunar\Content\Post_Types;
 use Lunar\Content\Taxonomies;
 use Lunar\Content\Game_Menu_Meta;
+use Lunar\Content\Update_Notes_Meta;
 use Lunar\Content\Meta_Fields;
 use Lunar\Content\Meta_Sync;
 
@@ -77,6 +78,9 @@ function bootstrap(): void {
 
 	$game_menu_meta = new Game_Menu_Meta();
 	$game_menu_meta->init();
+
+	$update_notes_meta = new Update_Notes_Meta();
+	$update_notes_meta->init();
 
 	$block_registry = new Block_Registry( LUNAR_CORE_PATH . 'build' );
 	$block_registry->init();
