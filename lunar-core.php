@@ -17,6 +17,9 @@ use Lunar\Blocks\Registry as Block_Registry;
 use Lunar\Blocks\Categories as Block_Categories;
 use Lunar\Blocks\Formats as Block_Formats;
 use Lunar\Blocks\Heading_Injector;
+use Lunar\Content\Post_Types;
+use Lunar\Content\Taxonomies;
+use Lunar\Content\Game_Menu_Meta;
 use Lunar\Content\Meta_Fields;
 use Lunar\Content\Meta_Sync;
 
@@ -66,6 +69,15 @@ spl_autoload_register( __NAMESPACE__ . '\\autoload' );
  * Urutan mengikuti Bootstrap Flow di BLUEPRINT.md §7.
  */
 function bootstrap(): void {
+	$post_types = new Post_Types();
+	$post_types->init();
+
+	$taxonomies = new Taxonomies();
+	$taxonomies->init();
+
+	$game_menu_meta = new Game_Menu_Meta();
+	$game_menu_meta->init();
+
 	$block_registry = new Block_Registry( LUNAR_CORE_PATH . 'build' );
 	$block_registry->init();
 
@@ -85,3 +97,33 @@ function bootstrap(): void {
 	$heading_injector->init();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap' );
+
+/**
+ * Dijalankan sekali saat plugin diaktifkan.
+ *
+ * CPT & Taxonomy didaftarkan langsung di sini (memanggil register()
+ * langsung, bukan lewat hook 'init' seperti biasa) supaya rewrite rule-nya
+ * sudah dikenali WordPress SEBELUM flush_rewrite_rules() dipanggil.
+ * Tanpa ini, permalink "/wiki/..." dan "/game/..." akan 404 sampai
+ * pengelola resave manual lewat Settings -> Permalinks.
+ */
+function activate(): void {
+	$post_types = new Post_Types();
+	$post_types->register();
+
+	$taxonomies = new Taxonomies();
+	$taxonomies->register();
+
+	flush_rewrite_rules();
+}
+register_activation_hook( __FILE__, __NAMESPACE__ . '\\activate' );
+
+/**
+ * Dijalankan sekali saat plugin dinonaktifkan.
+ * Membersihkan rewrite rule yang sempat ditambahkan (ENGINEERING_PRINCIPLES.md §13,
+ * Simplicity Wins — hindari rewrite rule mati menumpuk di database).
+ */
+function deactivate(): void {
+	flush_rewrite_rules();
+}
+register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivate' );

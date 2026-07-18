@@ -45,16 +45,16 @@ class Meta_Fields {
 	/**
 	 * Mendaftarkan seluruh meta field lewat register_post_meta().
 	 *
-	 * Catatan: object_subtype dikosongkan ('') sehingga berlaku untuk
-	 * SEMUA post type untuk saat ini, karena CPT "Wiki Artikel" belum
-	 * dibangun (masih di antrian Kelompok berikutnya). Setelah CPT ada,
-	 * ini tinggal diganti jadi nama CPT-nya — perubahan satu baris,
-	 * tidak memengaruhi struktur class ini.
+	 * Catatan: object_subtype kini diikat ke CPT "Wiki Artikel"
+	 * (Post_Types::get_slug()) — sebelumnya dikosongkan ('') karena CPT
+	 * tersebut belum dibangun. Field ini sekarang hanya berlaku untuk
+	 * Wiki Artikel, tidak lagi ke semua post type (lebih ketat & sesuai
+	 * maksud aslinya, Dokumen Perencanaan §3.4).
 	 */
 	public function register_fields(): void {
 		foreach ( self::FIELDS as $field ) {
 			register_post_meta(
-				'',
+				Post_Types::get_slug(),
 				self::META_PREFIX . $field,
 				array(
 					'type'              => 'string',
