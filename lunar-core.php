@@ -20,6 +20,7 @@ use Lunar\Blocks\Heading_Injector;
 use Lunar\Content\Post_Types;
 use Lunar\Content\Taxonomies;
 use Lunar\Content\Game_Menu_Meta;
+use Lunar\Content\Game_Tile_Meta;
 use Lunar\Content\Update_Notes_Meta;
 use Lunar\Content\Meta_Fields;
 use Lunar\Content\Meta_Sync;
@@ -78,6 +79,9 @@ function bootstrap(): void {
 
 	$game_menu_meta = new Game_Menu_Meta();
 	$game_menu_meta->init();
+
+	$game_tile_meta = new Game_Tile_Meta();
+	$game_tile_meta->init();
 
 	$update_notes_meta = new Update_Notes_Meta();
 	$update_notes_meta->init();
