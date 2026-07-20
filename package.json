@@ -8,6 +8,17 @@
 		"start": "wp-scripts start",
 		"plugin-zip": "wp-scripts plugin-zip"
 	},
+	"files": [
+		"assets",
+		"build",
+		"includes",
+		"languages",
+		"lunar-core.php",
+		"uninstall.php",
+		"changelog.md",
+		"readme.md",
+		"license.md"
+	],
 	"devDependencies": {
 		"@wordpress/scripts": "^30.0.0"
 	}

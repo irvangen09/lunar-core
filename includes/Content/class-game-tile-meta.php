@@ -84,7 +84,7 @@ class Game_Tile_Meta {
 				<label for="lunar-core-game-tile-url"><?php esc_html_e( 'URL Tujuan Kustom', 'lunar-core' ); ?></label>
 			</th>
 			<td>
-				<input type="url" class="regular-text" id="lunar-core-game-tile-url" name="lunar-core-game-tile-url" value="<?php echo esc_attr( $url ); ?>">
+				<input type="text" class="regular-text" id="lunar-core-game-tile-url" name="lunar-core-game-tile-url" value="<?php echo esc_attr( $url ); ?>" placeholder="/panduan-sosawl/">
 				<p class="description">
 					<?php esc_html_e( 'Kosongkan untuk memakai tautan arsip game default. Isi untuk mengarahkan Game Tile ke halaman lain, mis. Artikel Pilar.', 'lunar-core' ); ?>
 				</p>
@@ -162,19 +162,14 @@ class Game_Tile_Meta {
 	 * taxonomy Game — menghindari memuat aset yang tidak perlu di
 	 * layar admin lain (ENGINEERING_PRINCIPLES.md §8, Performance).
 	 *
-	 * @param string $hook Nama layar admin saat ini.
+	 * Memakai get_current_screen() (bukan menebak nama hook + $_GET)
+	 * karena ini cara WordPress yang paling tepat untuk mengetahui
+	 * taxonomy mana yang sedang dibuka di layar admin term manapun.
 	 */
-	public function enqueue_admin_assets( string $hook ): void {
-		$is_term_screen = in_array( $hook, array( 'term.php', 'edit-tags.php' ), true );
+	public function enqueue_admin_assets(): void {
+		$screen = get_current_screen();
 
-		if ( ! $is_term_screen ) {
-			return;
-		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- hanya dipakai untuk cek taxonomy aktif, bukan aksi ubah data.
-		$taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_key( wp_unslash( $_GET['taxonomy'] ) ) : '';
-
-		if ( Taxonomies::get_slug_game() !== $taxonomy ) {
+		if ( ! $screen || Taxonomies::get_slug_game() !== $screen->taxonomy ) {
 			return;
 		}
 
@@ -183,7 +178,7 @@ class Game_Tile_Meta {
 		wp_enqueue_script(
 			'lunar-core-game-tile-meta',
 			LUNAR_CORE_URL . 'assets/admin/game-tile-meta.js',
-			array(),
+			array( 'media-editor' ),
 			LUNAR_CORE_VERSION,
 			true
 		);
