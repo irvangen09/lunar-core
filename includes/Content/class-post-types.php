@@ -41,9 +41,12 @@ class Post_Types {
 	 * Mendaftarkan CPT "Wiki Artikel".
 	 *
 	 * Catatan keputusan:
-	 * - rewrite flat "/wiki/%postname%/" (bukan menyisipkan taxonomy ke URL
-	 *   artikel) — breadcrumb 5 level tetap ditampilkan Theme secara terpisah,
-	 *   tanpa bergantung pada struktur permalink (Simplicity Wins, ENGINEERING_PRINCIPLES.md §13).
+	 * - rewrite dasar "/wiki/%postname%/" (fallback untuk artikel tanpa
+	 *   term Game). Sejak Refactor Archive, artikel yang punya term Game
+	 *   memakai "/wiki/{game}/%postname%/" — lihat class terpisah
+	 *   Wiki_Artikel_Permalinks (revisi dari keputusan awal yang sengaja
+	 *   flat; direvisi karena tabrakan slug lintas-game nyata terjadi
+	 *   sebelum situs go-live, PROJECT_BRIEF.md §14).
 	 * - 'revisions' sengaja TIDAK didukung — situs tidak memakai revision
 	 *   history WordPress core (Dokumen Perencanaan §3.1), tanggal "Terakhir
 	 *   diperbarui" cukup diambil Theme dari post_modified secara native.
