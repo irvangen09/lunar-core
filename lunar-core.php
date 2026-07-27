@@ -4,7 +4,7 @@
  *
  * Plugin Name:       Lunar Core
  * Description:       Plugin pendamping LunarThemes — menangani data, Custom Post Type, Taxonomy, dan Gutenberg Block untuk dokumentasi wiki game.
- * Version:           0.2.0
+ * Version:           0.3.0
  * Requires PHP:      8.0
  * Text Domain:       lunar-core
  *

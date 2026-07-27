@@ -6,6 +6,11 @@ This project follows the format defined by [Keep a Changelog](https://keepachang
 
 > **Note:** During early development, each block maintained its own internal version (e.g. Timeline `v0.1.0` → `v0.1.2`) throughout the Deliverable/Revision stages before being marked as **LOCKED**. These versions were **not** plugin releases. This changelog records only plugin-wide releases, not the internal iteration history of individual blocks.
 
+## [0.3.0] - 2026-07-27
+
+### Added
+- **Public API**: Added `includes/public-api.php`, exposing `lunar_core_get_recognized_fields()`, `lunar_core_get_field_meta_key()`, `lunar_core_get_author_role()`, and `lunar_core_get_author_social_links()` as stable global functions, so companion themes no longer need to reference internal classes directly.
+
 ## [0.2.0] - 2026-07-18
 
 ### Added
