@@ -24,6 +24,7 @@ use Lunar\Content\Game_Tile_Meta;
 use Lunar\Content\Update_Notes_Meta;
 use Lunar\Content\Meta_Fields;
 use Lunar\Content\Meta_Sync;
+use Lunar\Users\Author_Fields;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Cegah akses langsung.
@@ -32,6 +33,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'LUNAR_CORE_VERSION', '0.1.0' );
 define( 'LUNAR_CORE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LUNAR_CORE_URL', plugin_dir_url( __FILE__ ) );
+
+/**
+ * Fungsi publik yang boleh dipanggil LunarThemes (atau tema/plugin lain)
+ * untuk membaca data dari LunarCore tanpa bergantung pada class internal
+ * (Meta_Fields, Author_Fields, dst). Lihat includes/public-api.php.
+ */
+require_once LUNAR_CORE_PATH . 'includes/public-api.php';
 
 /**
  * Autoloader sederhana untuk seluruh namespace Lunar\.
@@ -103,6 +111,9 @@ function bootstrap(): void {
 
 	$heading_injector = new Heading_Injector();
 	$heading_injector->init();
+
+	$author_fields = new Author_Fields();
+	$author_fields->init();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap' );
 
