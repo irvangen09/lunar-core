@@ -3,6 +3,12 @@
  * Markup statis Table — <table> polos dengan data-label per sel
  * (untuk tampilan card di mobile) dan data-key/data-type per kolom
  * (dipakai view.js untuk sort/filter).
+ *
+ * Catatan: <th> memakai scope="col" (accessibility, BLOCK_DEVELOPMENT_
+ * GUIDE.md §10). Ini mengubah markup tersimpan — Table block yang
+ * sudah dipublikasikan sebelum perubahan ini akan menampilkan Block
+ * Validation Error saat dibuka di editor (bukan di frontend), perlu
+ * "Attempt Block Recovery" atau resave sekali per artikel yang memakainya.
  */
 
 import { useBlockProps } from '@wordpress/block-editor';
@@ -26,7 +32,7 @@ export default function save( { attributes } ) {
 				<thead>
 					<tr>
 						{ columns.map( ( col ) => (
-							<th key={ col.key } data-key={ col.key } data-type={ col.type }>
+							<th key={ col.key } scope="col" data-key={ col.key } data-type={ col.type }>
 								{ col.label }
 							</th>
 						) ) }
