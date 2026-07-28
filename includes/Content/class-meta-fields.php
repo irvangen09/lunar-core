@@ -27,6 +27,14 @@ class Meta_Fields {
 	 * Daftar key field yang dikenali sistem (Dokumen Perencanaan §3.4).
 	 * Sengaja TIDAK termasuk "Game" — Game sudah punya taxonomy sendiri,
 	 * lihat pembahasan sebelum Tahap Tugas Infobox dimulai.
+	 *
+	 * PENTING — kamus ini juga punya salinan terpisah di sisi JS:
+	 * src/infobox/item/recognized-fields.js (RECOGNIZED_FIELDS).
+	 * Menambah/mengubah slug di sini TIDAK otomatis tersinkron ke JS —
+	 * slug di kedua tempat wajib diperbarui bersamaan secara manual.
+	 * Ini keterbatasan yang disengaja (save.js Gutenberg harus tetap
+	 * berjalan sinkron/pure function, tidak boleh memanggil REST API),
+	 * bukan sesuatu yang terlewat.
 	 */
 	private const FIELDS = array( 'peran', 'tier_alat', 'musim', 'waktu_muncul', 'jenis_hasil' );
 
