@@ -16,6 +16,8 @@
 
 namespace Lunar\Content;
 
+use Lunar\Services\Nonce_Verifier;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Cegah akses langsung.
 }
@@ -111,9 +113,7 @@ class Update_Notes_Meta {
 	 * @param int $post_id ID post yang disimpan.
 	 */
 	public function save_meta_box( int $post_id ): void {
-		if ( ! isset( $_POST[ self::NONCE_FIELD ] )
-			|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_FIELD ] ) ), self::NONCE_ACTION )
-		) {
+		if ( ! Nonce_Verifier::is_valid( self::NONCE_FIELD, self::NONCE_ACTION ) ) {
 			return;
 		}
 
