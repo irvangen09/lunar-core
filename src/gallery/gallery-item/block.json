@@ -31,6 +31,5 @@
 	"supports": {
 		"html": false,
 		"reusable": false
-	},
-	"editorScript": "file:./index.js"
+	}
 }
