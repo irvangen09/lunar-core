@@ -25,9 +25,14 @@ class Meta_Sync {
 
 	/**
 	 * Mendaftarkan hook WordPress.
+	 *
+	 * Sengaja di-scope ke "save_post_{$post_type}" (bukan "save_post"
+	 * generik) — supaya sync tidak ikut berjalan (parse_blocks +
+	 * update/delete_post_meta yang sia-sia) di setiap penyimpanan
+	 * WP Page atau Post native, konsisten dengan pola Update_Notes_Meta.
 	 */
 	public function init(): void {
-		add_action( 'save_post', array( $this, 'sync' ), 10, 2 );
+		add_action( 'save_post_' . Post_Types::get_slug(), array( $this, 'sync' ), 10, 2 );
 	}
 
 	/**
