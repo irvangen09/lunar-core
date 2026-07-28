@@ -24,6 +24,8 @@
  */
 
 use Lunar\Content\Meta_Fields;
+use Lunar\Content\Game_Menu_Meta;
+use Lunar\Content\Game_Tile_Meta;
 use Lunar\Users\Author_Fields;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -64,9 +66,47 @@ function lunar_core_get_author_role( int $user_id ): string {
  * Daftar link sosial media penulis, sudah diproses jadi array siap
  * pakai untuk Author Box LunarThemes.
  *
+ * Catatan: field 'icon' berupa nama class dashicons (mis.
+ * "dashicons-twitter") — pemuatan font dashicons di frontend adalah
+ * tanggung jawab pemanggil (Theme), LunarCore tidak memuatnya untuk
+ * konteks Author Box.
+ *
  * @param int $user_id ID user.
  * @return array<int, array{label: string, url: string, icon: string}>
  */
 function lunar_core_get_author_social_links( int $user_id ): array {
 	return Author_Fields::get_social_links( $user_id );
+}
+
+/**
+ * Key term meta untuk Menu Sekunder per Judul Game (dropdown pilihan
+ * menu WordPress di layar edit term taxonomy Game).
+ *
+ * Catatan: LunarThemes saat ini membaca key ini sebagai string literal
+ * langsung (diperlakukan sebagai stable public data contract, lihat
+ * komentar di game-context.php/game-queries.php) — fungsi ini murni
+ * opsi tambahan yang aditif, bukan keharusan migrasi.
+ *
+ * @return string
+ */
+function lunar_core_get_game_menu_meta_key(): string {
+	return Game_Menu_Meta::get_meta_key();
+}
+
+/**
+ * Key term meta untuk URL tujuan kustom Game Tile di Homepage.
+ *
+ * @return string
+ */
+function lunar_core_get_game_tile_url_meta_key(): string {
+	return Game_Tile_Meta::get_url_meta_key();
+}
+
+/**
+ * Key term meta untuk ID attachment gambar kustom Game Tile di Homepage.
+ *
+ * @return string
+ */
+function lunar_core_get_game_tile_image_meta_key(): string {
+	return Game_Tile_Meta::get_image_meta_key();
 }
