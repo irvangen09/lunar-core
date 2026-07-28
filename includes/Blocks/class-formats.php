@@ -86,8 +86,25 @@ class Formats {
 	/**
 	 * Memuat style saja di frontend — badge harus tetap tampil ke
 	 * pembaca meski tombol toolbar (JS) tidak relevan di luar editor.
+	 *
+	 * Dimuat KONDISIONAL, hanya saat post_content halaman yang sedang
+	 * dibuka benar-benar mengandung marker Format ini (ARCHITECTURE.md
+	 * §14, Conditional Asset Loading) — konsisten dengan pola
+	 * Registry::maybe_enqueue_dashicons(). WordPress tidak menyediakan
+	 * has_block()-setara untuk RichText Format, jadi dicek manual lewat
+	 * className yang diserialisasi Format ini ke post_content.
 	 */
 	public function enqueue_frontend_style(): void {
+		if ( ! is_singular() ) {
+			return;
+		}
+
+		$post = get_post();
+
+		if ( ! $post || ! str_contains( $post->post_content, 'lunar-version-tag' ) ) {
+			return;
+		}
+
 		$asset = $this->get_asset_file( 'version-tag' );
 
 		if ( null === $asset ) {
