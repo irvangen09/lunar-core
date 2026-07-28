@@ -1,20 +1,33 @@
 /**
  * Lokasi: lunar-core/src/gallery/index.js
- * Entry point — mendaftarkan block Gallery (parent). Gallery Item
- * didaftarkan terpisah lewat gallery-item/index.js sendiri
- * (pengecualian historis — block lain memakai satu index.js gabungan).
+ * Entry point — mendaftarkan block induk (Gallery) sekaligus block
+ * anak (Gallery Item), mengikuti pola yang sama seperti Accordion,
+ * Definition List & Infobox. Sebelumnya Gallery Item didaftarkan
+ * lewat index.js terpisah miliknya sendiri (pengecualian historis);
+ * digabungkan di sini agar konsisten dengan 6 block parent-child lain.
  */
 
 import { registerBlockType } from '@wordpress/blocks';
 
-import metadata from './block.json';
-import Edit from './edit';
-import save from './save';
+import galleryMetadata from './block.json';
+import GalleryEdit from './edit';
+import gallerySave from './save';
+
+import itemMetadata from './gallery-item/block.json';
+import ItemEdit from './gallery-item/edit';
+import itemSave from './gallery-item/save';
+
 import './style.scss';
 import './editor.scss';
 
-registerBlockType( metadata.name, {
+registerBlockType( galleryMetadata.name, {
 	icon: 'format-gallery',
-	edit: Edit,
-	save,
+	edit: GalleryEdit,
+	save: gallerySave,
+} );
+
+registerBlockType( itemMetadata.name, {
+	icon: 'format-image',
+	edit: ItemEdit,
+	save: itemSave,
 } );
