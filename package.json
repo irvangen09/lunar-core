@@ -13,11 +13,7 @@
 		"build",
 		"includes",
 		"languages",
-		"lunar-core.php",
-		"uninstall.php",
-		"CHANGELOG.md",
-		"README.md",
-		"license.md"
+		"lunar-core.php"
 	],
 	"devDependencies": {
 		"@wordpress/scripts": "^30.0.0"
