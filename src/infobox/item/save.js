@@ -10,22 +10,14 @@
  * mengambil isinya.
  */
 
-import { __ } from '@wordpress/i18n';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
-
-const RECOGNIZED_LABELS = {
-	peran: __( 'Peran', 'lunar-core' ),
-	tier_alat: __( 'Tier Alat', 'lunar-core' ),
-	musim: __( 'Musim', 'lunar-core' ),
-	waktu_muncul: __( 'Waktu Muncul', 'lunar-core' ),
-	jenis_hasil: __( 'Jenis Hasil', 'lunar-core' ),
-};
+import { getRecognizedLabel } from './recognized-fields';
 
 export default function save( { attributes } ) {
 	const { mode, label, recognizedField, value } = attributes;
 
 	const isRecognized = mode === 'dikenali';
-	const displayLabel = isRecognized ? RECOGNIZED_LABELS[ recognizedField ] || '' : label;
+	const displayLabel = isRecognized ? getRecognizedLabel( recognizedField ) : label;
 
 	const blockProps = useBlockProps.save( {
 		className: 'lunar-infobox-field',
