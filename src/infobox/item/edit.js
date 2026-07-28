@@ -8,14 +8,7 @@
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, RichText, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, RadioControl, SelectControl } from '@wordpress/components';
-
-const RECOGNIZED_FIELDS = [
-	{ value: 'peran', label: __( 'Peran', 'lunar-core' ) },
-	{ value: 'tier_alat', label: __( 'Tier Alat', 'lunar-core' ) },
-	{ value: 'musim', label: __( 'Musim', 'lunar-core' ) },
-	{ value: 'waktu_muncul', label: __( 'Waktu Muncul', 'lunar-core' ) },
-	{ value: 'jenis_hasil', label: __( 'Jenis Hasil', 'lunar-core' ) },
-];
+import { RECOGNIZED_FIELDS, getRecognizedLabel } from './recognized-fields';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { mode, label, recognizedField, value } = attributes;
@@ -24,9 +17,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		className: 'lunar-infobox-field',
 	} );
 
-	const recognizedLabel =
-		RECOGNIZED_FIELDS.find( ( field ) => field.value === recognizedField )?.label ||
-		__( '— Pilih field —', 'lunar-core' );
+	const recognizedLabel = getRecognizedLabel( recognizedField ) || __( '— Pilih field —', 'lunar-core' );
 
 	return (
 		<>
