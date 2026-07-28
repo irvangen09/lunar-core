@@ -18,6 +18,8 @@
 
 namespace Lunar\Content;
 
+use Lunar\Services\Nonce_Verifier;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Cegah akses langsung.
 }
@@ -133,9 +135,7 @@ class Game_Menu_Meta {
 	 * @param int $term_id ID term yang baru dibuat/diedit.
 	 */
 	public function save_meta( int $term_id ): void {
-		if ( ! isset( $_POST[ self::NONCE_FIELD ] )
-			|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_FIELD ] ) ), self::NONCE_ACTION )
-		) {
+		if ( ! Nonce_Verifier::is_valid( self::NONCE_FIELD, self::NONCE_ACTION ) ) {
 			return;
 		}
 
