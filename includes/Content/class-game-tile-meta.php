@@ -183,4 +183,22 @@ class Game_Tile_Meta {
 			true
 		);
 	}
+
+	/**
+	 * Key term meta untuk URL tujuan kustom Game Tile.
+	 *
+	 * @return string
+	 */
+	public static function get_url_meta_key(): string {
+		return self::URL_META_KEY;
+	}
+
+	/**
+	 * Key term meta untuk ID attachment gambar kustom Game Tile.
+	 *
+	 * @return string
+	 */
+	public static function get_image_meta_key(): string {
+		return self::IMAGE_META_KEY;
+	}
 }
