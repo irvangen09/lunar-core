@@ -18,6 +18,7 @@
 namespace Lunar\Blocks;
 
 use Lunar\Services\Heading_Anchors;
+use Lunar\Services\Accordion_Item_Title;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Cegah akses langsung.
@@ -131,11 +132,7 @@ class Heading_Injector {
 		// bersumber dari HTML (rich-text), tidak tersedia di $block['attrs']
 		// lewat filter render_block_* (sama seperti masalah di TOC_Builder).
 		// Ekstrak langsung dari markup yang sudah dirender.
-		if ( ! preg_match( '/<h[1-6][^>]*class="[^"]*lunar-accordion-item__title[^"]*"[^>]*>(.*?)<\/h[1-6]>/s', $block_content, $matches ) ) {
-			return $block_content;
-		}
-
-		$text = trim( wp_strip_all_tags( $matches[1] ) );
+		$text = Accordion_Item_Title::extract( $block_content );
 
 		if ( '' === $text ) {
 			return $block_content;
