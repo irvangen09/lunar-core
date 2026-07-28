@@ -15,8 +15,8 @@
 		"languages",
 		"lunar-core.php",
 		"uninstall.php",
-		"changelog.md",
-		"readme.md",
+		"CHANGELOG.md",
+		"README.md",
 		"license.md"
 	],
 	"devDependencies": {

@@ -6,6 +6,12 @@ This project follows the format defined by [Keep a Changelog](https://keepachang
 
 > **Note:** During early development, each block maintained its own internal version (e.g. Timeline `v0.1.0` → `v0.1.2`) throughout the Deliverable/Revision stages before being marked as **LOCKED**. These versions were **not** plugin releases. This changelog records only plugin-wide releases, not the internal iteration history of individual blocks.
 
+## [0.3.1] - 2026-07-28
+
+### Fixed
+- `LUNAR_CORE_VERSION` was still `0.1.0` despite three prior version bumps, so cache-busting for admin assets (e.g. `game-tile-meta.js`) never actually changed release to release. The constant now matches the plugin header.
+- Corrected the `[0.2.0]` entry below, which had mischaracterized the game secondary-menu feature as a new Custom Post Type and taxonomy; it is term meta on the existing `Game` taxonomy.
+
 ## [0.3.0] - 2026-07-27
 
 ### Added
@@ -14,9 +20,8 @@ This project follows the format defined by [Keep a Changelog](https://keepachang
 ## [0.2.0] - 2026-07-18
 
 ### Added
-- **Game Menu CPT**: Registered new `game-menu` Custom Post Type to handle gaming documentation structures.
-- **Custom Taxonomies**: Added `Game` and `Content Type` taxonomies support specifically for the Game Menu ecosystem.
-- **Custom Meta Fields**: Implemented secure metadata storage with the addition of `class-game-menu-meta.php` and `class-meta-fields.php`.
+- **Secondary menu per game title**: Added term meta on the existing `Game` taxonomy to associate each game title with a WordPress navigation menu (`class-game-menu-meta.php`), replacing manual name-matching in the theme.
+- **Custom Meta Fields**: Implemented secure metadata storage with the addition of `class-meta-fields.php`.
 
 ### Changed
 - **Core Bootstrap**: Updated `lunar-core.php` core file to boot and wire up the new Game Menu features.
