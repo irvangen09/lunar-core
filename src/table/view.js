@@ -5,6 +5,13 @@
  * pencarian) ke Table di frontend. Tanpa file ini, tabel tetap
  * tampil penuh & terbaca — cuma tanpa kemampuan sort/filter.
  *
+ * Baris Divider/Section (class "lunar-table__row--divider") tidak
+ * ikut diurutkan atau dinilai isinya — baris ini jadi batas antar
+ * kelompok. Sort bekerja PER KELOMPOK (baris di antara dua Divider,
+ * atau sebelum Divider pertama/setelah Divider terakhir), bukan
+ * lintas seluruh tabel — supaya pengelompokan yang sengaja dibuat
+ * lewat Divider tidak ikut teracak saat sort diaktifkan.
+ *
  * Hanya dimuat di frontend (viewScript di block.json).
  */
 
@@ -14,26 +21,68 @@
 		return cell ? cell.textContent.trim() : '';
 	}
 
-	function sortRows( tableEl, key, type, direction ) {
-		var tbody = tableEl.querySelector( 'tbody' );
-		var rows = Array.prototype.slice.call( tbody.querySelectorAll( 'tr' ) );
+	function isDividerRow( row ) {
+		return row.classList.contains( 'lunar-table__row--divider' );
+	}
 
-		rows.sort( function ( a, b ) {
-			var aText = getCellText( a, key );
-			var bText = getCellText( b, key );
-			var result;
-
-			if ( 'number' === type ) {
-				result = parseFloat( aText || '0' ) - parseFloat( bText || '0' );
-			} else {
-				result = aText.localeCompare( bText, undefined, { numeric: true, sensitivity: 'base' } );
-			}
-
-			return 'desc' === direction ? -result : result;
-		} );
+	// Pecah baris tbody jadi beberapa kelompok berdasarkan posisi baris
+	// Divider. Setiap kelompok berisi baris data yang berurutan; baris
+	// Divider disimpan terpisah sebagai penanda batas, bukan bagian
+	// dari kelompok manapun.
+	function groupRowsByDivider( rows ) {
+		var groups = [];
+		var currentGroup = [];
 
 		rows.forEach( function ( row ) {
-			tbody.appendChild( row );
+			if ( isDividerRow( row ) ) {
+				groups.push( { divider: null, rows: currentGroup } );
+				groups.push( { divider: row, rows: [] } );
+				currentGroup = [];
+			} else {
+				currentGroup.push( row );
+			}
+		} );
+
+		groups.push( { divider: null, rows: currentGroup } );
+
+		return groups;
+	}
+
+	function compareRows( a, b, key, type, direction ) {
+		var aText = getCellText( a, key );
+		var bText = getCellText( b, key );
+		var result;
+
+		if ( 'number' === type ) {
+			result = parseFloat( aText || '0' ) - parseFloat( bText || '0' );
+		} else {
+			result = aText.localeCompare( bText, undefined, { numeric: true, sensitivity: 'base' } );
+		}
+
+		return 'desc' === direction ? -result : result;
+	}
+
+	function sortRows( tableEl, key, type, direction ) {
+		var tbody = tableEl.querySelector( 'tbody' );
+		var allRows = Array.prototype.slice.call( tbody.querySelectorAll( 'tr' ) );
+		var groups = groupRowsByDivider( allRows );
+
+		groups.forEach( function ( group ) {
+			group.rows.sort( function ( a, b ) {
+				return compareRows( a, b, key, type, direction );
+			} );
+		} );
+
+		// Tulis ulang urutan DOM: kelompok data lalu Divider penutupnya,
+		// berurutan sesuai posisi asal — Divider tidak pernah pindah.
+		groups.forEach( function ( group ) {
+			group.rows.forEach( function ( row ) {
+				tbody.appendChild( row );
+			} );
+
+			if ( group.divider ) {
+				tbody.appendChild( group.divider );
+			}
 		} );
 	}
 
@@ -71,6 +120,37 @@
 		} );
 	}
 
+	function rowMatchesQuery( row, query ) {
+		var text = row.textContent.toLowerCase();
+		return '' === query || -1 !== text.indexOf( query );
+	}
+
+	function applyFilter( tableEl, query ) {
+		var tbody = tableEl.querySelector( 'tbody' );
+		var allRows = Array.prototype.slice.call( tbody.querySelectorAll( 'tr' ) );
+		var groups = groupRowsByDivider( allRows );
+
+		groups.forEach( function ( group ) {
+			var groupHasMatch = false;
+
+			group.rows.forEach( function ( row ) {
+				var matches = rowMatchesQuery( row, query );
+				row.toggleAttribute( 'hidden', ! matches );
+
+				if ( matches ) {
+					groupHasMatch = true;
+				}
+			} );
+
+			if ( group.divider ) {
+				// Divider ikut disembunyikan kalau sedang memfilter dan
+				// tidak ada satu pun baris di kelompoknya yang cocok —
+				// supaya tidak menyisakan judul section kosong tanpa isi.
+				group.divider.toggleAttribute( 'hidden', '' !== query && ! groupHasMatch );
+			}
+		} );
+	}
+
 	function initFilter( wrapperEl, tableEl ) {
 		var searchWrap = document.createElement( 'div' );
 		searchWrap.className = 'lunar-table__filter';
@@ -85,18 +165,7 @@
 		wrapperEl.insertBefore( searchWrap, tableEl );
 
 		input.addEventListener( 'input', function () {
-			var query = input.value.trim().toLowerCase();
-			var rows = tableEl.querySelectorAll( 'tbody tr' );
-
-			rows.forEach( function ( row ) {
-				var text = row.textContent.toLowerCase();
-
-				if ( '' === query || -1 !== text.indexOf( query ) ) {
-					row.removeAttribute( 'hidden' );
-				} else {
-					row.setAttribute( 'hidden', '' );
-				}
-			} );
+			applyFilter( tableEl, input.value.trim().toLowerCase() );
 		} );
 	}
 
