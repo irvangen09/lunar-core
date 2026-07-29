@@ -96,6 +96,14 @@
 		display: block;
 	}
 
+	// Baris yang disembunyikan filter (view.js men-set atribut [hidden])
+	// harus tetap benar-benar hilang di sini. Tanpa aturan ini, "tr"
+	// polos di atas menang karena sama-sama author stylesheet, padahal
+	// [hidden] punya spesifisitas lebih tinggi (attribute selector).
+	.lunar-table__table tr[hidden] {
+		display: none;
+	}
+
 	.lunar-table__table thead {
 		// Header asli disembunyikan secara aksesibel (tetap terbaca
 		// screen reader), digantikan data-label per sel.
