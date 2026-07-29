@@ -9,6 +9,13 @@
  * sudah dipublikasikan sebelum perubahan ini akan menampilkan Block
  * Validation Error saat dibuka di editor (bukan di frontend), perlu
  * "Attempt Block Recovery" atau resave sekali per artikel yang memakainya.
+ *
+ * Baris Divider/Section (row.isDivider) dirender sebagai satu <td>
+ * yang melebar penuh (colSpan) tanpa data-key — sengaja tidak ikut
+ * skema data-label/data-key kolom biasa, karena bukan sel data.
+ * view.js men-tandai baris ini lewat class "lunar-table__row--divider"
+ * agar sort & filter bisa memperlakukannya sebagai batas kelompok,
+ * bukan baris data biasa.
  */
 
 import { useBlockProps } from '@wordpress/block-editor';
@@ -39,15 +46,45 @@ export default function save( { attributes } ) {
 					</tr>
 				</thead>
 				<tbody>
-					{ rows.map( ( row, index ) => (
-						<tr key={ index }>
-							{ columns.map( ( col ) => (
-								<td key={ col.key } data-label={ col.label } data-key={ col.key }>
-									{ row[ col.key ] ?? '' }
-								</td>
-							) ) }
-						</tr>
-					) ) }
+					{ rows.map( ( row, index ) => {
+						if ( row.isDivider ) {
+							return (
+								<tr key={ index } className="lunar-table__row--divider">
+									<td colSpan={ columns.length } className="lunar-table__divider-cell">
+										{ row.dividerLabel ?? '' }
+									</td>
+								</tr>
+							);
+						}
+
+						return (
+							<tr key={ index }>
+								{ columns.map( ( col ) => {
+									if ( 'image' === col.type ) {
+										const image = row[ col.key ];
+
+										return (
+											<td key={ col.key } data-label={ col.label } data-key={ col.key }>
+												{ image?.url && (
+													<img
+														src={ image.url }
+														alt={ image.alt || '' }
+														style={ { width: ( col.imageWidth || 48 ) + 'px', height: 'auto' } }
+													/>
+												) }
+											</td>
+										);
+									}
+
+									return (
+										<td key={ col.key } data-label={ col.label } data-key={ col.key }>
+											{ row[ col.key ] ?? '' }
+										</td>
+									);
+								} ) }
+							</tr>
+						);
+					} ) }
 				</tbody>
 			</table>
 		</div>
