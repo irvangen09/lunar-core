@@ -113,12 +113,12 @@ export default function Edit( { attributes, setAttributes } ) {
 												onChange={ ( value ) => updateColumn( col.key, { type: value } ) }
 											/>
 											<Button
-												icon="trash"
-												label={ __( 'Hapus Kolom', 'lunar-core' ) }
 												onClick={ () => removeColumn( col.key ) }
 												isDestructive
 												isSmall
-											/>
+											>
+												{ __( 'Hapus', 'lunar-core' ) }
+											</Button>
 										</th>
 									) ) }
 								</tr>
@@ -136,12 +136,12 @@ export default function Edit( { attributes, setAttributes } ) {
 										) ) }
 										<td>
 											<Button
-												icon="trash"
-												label={ __( 'Hapus Baris', 'lunar-core' ) }
 												onClick={ () => removeRow( index ) }
 												isDestructive
 												isSmall
-											/>
+											>
+												{ __( 'Hapus', 'lunar-core' ) }
+											</Button>
 										</td>
 									</tr>
 								) ) }
