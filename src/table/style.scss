@@ -61,8 +61,12 @@
 	thead th {
 		background: var( --color-surface-2, #f7f1e4 );
 		font-family: var( --font-display, serif );
+		font-size: 0.98rem;
 		font-weight: 600;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
 		color: var( --color-text, #2b2015 );
+		border-bottom: 2px solid var( --color-accent, #b2512e );
 	}
 
 	tbody tr:nth-child( even ) {
@@ -140,10 +144,13 @@
 
 	.lunar-table__table tbody tr {
 		display: grid;
-		grid-template-columns: repeat( auto-fill, minmax( 130px, 1fr ) );
+		// Satu kolom, bukan auto-fill 2 kolom — supaya tinggi tiap field
+		// tidak lagi saling mempengaruhi (masalah lama: field pendek di
+		// sebelah field panjang menyisakan kotak kosong yang timpang).
+		grid-template-columns: 1fr;
 		gap: 1px;
 
-		margin-bottom: 16px;
+		margin-bottom: 10px;
 		background: var( --color-border, #d9cbaa );
 		border: 1px solid var( --color-border, #d9cbaa );
 		border-radius: var( --radius-card, 8px );
@@ -152,40 +159,55 @@
 
 	.lunar-table__table td {
 		background: var( --color-surface, #fbf8f0 );
-		padding: 8px 12px;
+		padding: 6px 12px;
 		border: none;
 
 		&::before {
 			content: attr( data-label );
 			display: block;
-			margin-bottom: 2px;
+			margin-bottom: 4px;
+			padding-bottom: 2px;
+			border-bottom: 2px solid var( --color-accent, #b2512e );
 
 			font-family: var( --font-display, serif );
-			font-size: 0.7rem;
-			font-weight: 600;
-			letter-spacing: 0.03em;
+			font-size: 0.72rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
 			text-transform: uppercase;
-			color: var( --color-text-muted, #6b5d46 );
+			color: var( --color-text, #2b2015 );
 		}
 	}
 
 	// Divider tidak ikut berbentuk "card" seperti baris data — cukup
-	// jadi label section penuh-lebar, tanpa grid kolom & tanpa border
-	// pembungkus tambahan (background sudah dari .lunar-table__divider-cell).
+	// jadi label section yang MENEMPEL ke grup baris berikutnya (sudut
+	// atas membulat, sudut bawah lurus), bukan kotak terpisah yang
+	// mengambang di antara dua grup. Jarak cuma diberi di atas Divider
+	// (pemisah dari grup sebelumnya), bukan di bawahnya.
 	.lunar-table__table tr.lunar-table__row--divider {
 		display: block;
 		background: none;
 		border: none;
-		border-radius: 0;
-		margin-bottom: 8px;
+		margin-top: 14px;
+		margin-bottom: 0;
 	}
 
 	.lunar-table__table tr.lunar-table__row--divider td {
 		display: block;
 		width: 100%;
+		border-top-left-radius: var( --radius-card, 8px );
+		border-top-right-radius: var( --radius-card, 8px );
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
 
 		&::before {
 			content: none;
 		}
+	}
+
+	// Baris data tepat setelah Divider: sudut atas diluruskan supaya
+	// menyambung rata dengan Divider di atasnya, seolah satu kesatuan.
+	.lunar-table__table tr.lunar-table__row--divider + tr {
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
 	}
 }
