@@ -58,16 +58,20 @@
 	}
 }
 
-// Baris Divider: field-nya cuma satu (teks pembagi), beri latar beda
-// supaya langsung kelihatan bedanya dari baris data biasa saat mengedit.
+// Baris Divider: field-nya cuma satu (teks pembagi). Latar beda + teks
+// bold rata-tengah supaya langsung kelihatan bedanya dari baris data
+// biasa saat mengedit — sekaligus mendekati pratinjau tampilan frontend.
+// Ditarget juga ke input di dalamnya (bukan cuma <td>), karena kotak
+// input putih menutupi hampir seluruh sel sehingga warna latar td saja
+// nyaris tidak kelihatan.
 .lunar-table-editor__row--divider td {
 	background: var( --color-surface-2, #f7f1e4 );
-}
+	border-left: 3px solid var( --color-accent, #b2512e );
 
-.lunar-table-editor__row-actions {
-	min-width: 110px;
-
-	.components-toggle-control {
-		margin-bottom: 6px;
+	.components-text-control__input {
+		background: var( --color-surface-2, #f7f1e4 );
+		font-family: var( --font-display, serif );
+		font-weight: 600;
+		text-align: center;
 	}
 }
