@@ -1,30 +1,27 @@
 /**
  * Lokasi: lunar-core/src/table/edit.js
- * UI editor kustom untuk Table — mini-spreadsheet: kolom & baris bisa
- * ditambah/dihapus/diedit langsung di badan block, bukan InnerBlocks.
+ * UI editor Table — mengikuti pola interaksi WP Table Block bawaan:
+ * grid tabel yang bersih (cuma label header & isi sel), sisip/hapus
+ * baris & kolom lewat toolbar kontekstual (table-toolbar.js) sesuai
+ * sel yang sedang fokus, bukan tombol tambah/hapus di tiap kolom/baris.
+ *
+ * Beda sengaja dari WP Table Block asli: sel di sini TIDAK memakai
+ * RichText (isi tetap teks polos / angka / gambar, bukan HTML) —
+ * data Table adalah data terstruktur (harga, jadwal, stat item),
+ * bukan teks naratif yang butuh format kaya (bold/italic/dll).
+ * Keputusan ini disepakati eksplisit oleh Product Owner.
  */
 
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import {
 	useBlockProps,
 	InspectorControls,
 	MediaUpload,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	ToggleControl,
-	Button,
-	TextControl,
-	TextareaControl,
-	SelectControl,
-} from '@wordpress/components';
-
-const COLUMN_TYPES = [
-	{ label: __( 'Teks', 'lunar-core' ), value: 'text' },
-	{ label: __( 'Angka', 'lunar-core' ), value: 'number' },
-	{ label: __( 'Gambar', 'lunar-core' ), value: 'image' },
-];
+import { PanelBody, ToggleControl, TextControl, TextareaControl, Button } from '@wordpress/components';
+import TableToolbar from './table-toolbar';
 
 const DEFAULT_IMAGE_WIDTH = 48;
 
@@ -32,76 +29,170 @@ function generateColumnKey() {
 	return 'col_' + Math.random().toString( 36 ).slice( 2, 8 );
 }
 
+function buildEmptyRow( columns ) {
+	const row = { isDivider: false };
+	columns.forEach( ( col ) => {
+		row[ col.key ] = '';
+	} );
+	return row;
+}
+
 export default function Edit( { attributes, setAttributes } ) {
 	const { columns, rows, enableSort, enableFilter } = attributes;
+
+	// { rowIndex, colIndex } dari sel yang terakhir difokus pengguna —
+	// menentukan aksi mana yang aktif di TableToolbar. rowIndex -1
+	// berarti sedang fokus di baris header (label kolom).
+	const [ focusedCell, setFocusedCell ] = useState( { rowIndex: null, colIndex: null } );
+
+	// State lokal untuk form "buat tabel" (belum jadi attributes
+	// sampai tombol "Buat Tabel" ditekan).
+	const [ pendingColumnCount, setPendingColumnCount ] = useState( '3' );
+	const [ pendingRowCount, setPendingRowCount ] = useState( '3' );
 
 	const blockProps = useBlockProps( {
 		className: 'lunar-table-editor',
 	} );
 
-	function addColumn() {
-		const newKey = generateColumnKey();
-		const newColumns = [ ...columns, { key: newKey, label: __( 'Kolom Baru', 'lunar-core' ), type: 'text' } ];
-		const newRows = rows.map( ( row ) => ( { ...row, [ newKey ]: '' } ) );
+	function resetFocus() {
+		setFocusedCell( { rowIndex: null, colIndex: null } );
+	}
+
+	function createTable() {
+		const columnCount = Math.max( 1, parseInt( pendingColumnCount, 10 ) || 1 );
+		const rowCount = Math.max( 1, parseInt( pendingRowCount, 10 ) || 1 );
+
+		const newColumns = [];
+		for ( let i = 0; i < columnCount; i++ ) {
+			newColumns.push( { key: generateColumnKey(), label: '', type: 'text' } );
+		}
+
+		const newRows = [];
+		for ( let i = 0; i < rowCount; i++ ) {
+			newRows.push( buildEmptyRow( newColumns ) );
+		}
+
 		setAttributes( { columns: newColumns, rows: newRows } );
 	}
 
-	function removeColumn( key ) {
-		const newColumns = columns.filter( ( col ) => col.key !== key );
+	function updateColumnLabel( colIndex, label ) {
+		const newColumns = columns.map( ( col, i ) => ( i === colIndex ? { ...col, label } : col ) );
+		setAttributes( { columns: newColumns } );
+	}
+
+	function setColumnType( type ) {
+		const colIndex = focusedCell.colIndex;
+
+		if ( null === colIndex ) {
+			return;
+		}
+
+		const changes = { type };
+
+		if ( 'image' === type && ! columns[ colIndex ]?.imageWidth ) {
+			changes.imageWidth = DEFAULT_IMAGE_WIDTH;
+		}
+
+		const newColumns = columns.map( ( col, i ) => ( i === colIndex ? { ...col, ...changes } : col ) );
+		setAttributes( { columns: newColumns } );
+	}
+
+	function setColumnImageWidth( colIndex, width ) {
+		const newColumns = columns.map( ( col, i ) => ( i === colIndex ? { ...col, imageWidth: width } : col ) );
+		setAttributes( { columns: newColumns } );
+	}
+
+	function insertColumn( atIndex ) {
+		const newColumn = { key: generateColumnKey(), label: '', type: 'text' };
+		const newColumns = [ ...columns ];
+		newColumns.splice( atIndex, 0, newColumn );
+
+		const newRows = rows.map( ( row ) => ( { ...row, [ newColumn.key ]: '' } ) );
+
+		setAttributes( { columns: newColumns, rows: newRows } );
+		resetFocus();
+	}
+
+	function deleteColumn() {
+		const colIndex = focusedCell.colIndex;
+
+		if ( null === colIndex ) {
+			return;
+		}
+
+		const key = columns[ colIndex ].key;
+		const newColumns = columns.filter( ( _col, i ) => i !== colIndex );
 		const newRows = rows.map( ( row ) => {
 			const updated = { ...row };
 			delete updated[ key ];
 			return updated;
 		} );
+
 		setAttributes( { columns: newColumns, rows: newRows } );
+		resetFocus();
 	}
 
-	function updateColumn( key, changes ) {
-		const newColumns = columns.map( ( col ) => ( col.key === key ? { ...col, ...changes } : col ) );
-		setAttributes( { columns: newColumns } );
+	function insertRow( atIndex ) {
+		const newRows = [ ...rows ];
+		newRows.splice( atIndex, 0, buildEmptyRow( columns ) );
+		setAttributes( { rows: newRows } );
+		resetFocus();
 	}
 
-	function updateColumnType( key, type ) {
-		// Kolom yang baru diubah jadi tipe Gambar otomatis diberi lebar
-		// default, supaya pengguna tidak perlu mengisi manual dari 0.
-		const changes = { type };
+	function deleteRow() {
+		const rowIndex = focusedCell.rowIndex;
 
-		const col = columns.find( ( item ) => item.key === key );
-
-		if ( 'image' === type && ! col?.imageWidth ) {
-			changes.imageWidth = DEFAULT_IMAGE_WIDTH;
+		if ( null === rowIndex || -1 === rowIndex ) {
+			return;
 		}
 
-		updateColumn( key, changes );
+		setAttributes( { rows: rows.filter( ( _row, i ) => i !== rowIndex ) } );
+		resetFocus();
 	}
 
-	function addRow() {
-		const newRow = { isDivider: false };
-		columns.forEach( ( col ) => {
-			newRow[ col.key ] = '';
-		} );
-		setAttributes( { rows: [ ...rows, newRow ] } );
-	}
+	function toggleDivider() {
+		const rowIndex = focusedCell.rowIndex;
 
-	function removeRow( index ) {
-		setAttributes( { rows: rows.filter( ( _row, i ) => i !== index ) } );
-	}
+		if ( null === rowIndex || -1 === rowIndex ) {
+			return;
+		}
 
-	function updateRow( index, changes ) {
-		const newRows = rows.map( ( row, i ) => ( i === index ? { ...row, ...changes } : row ) );
+		const newRows = rows.map( ( row, i ) => ( i === rowIndex ? { ...row, isDivider: ! row.isDivider } : row ) );
 		setAttributes( { rows: newRows } );
 	}
 
-	function updateCell( index, key, value ) {
-		updateRow( index, { [ key ]: value } );
+	function updateRow( rowIndex, changes ) {
+		const newRows = rows.map( ( row, i ) => ( i === rowIndex ? { ...row, ...changes } : row ) );
+		setAttributes( { rows: newRows } );
 	}
 
-	function updateCellImage( index, key, media ) {
-		updateCell( index, key, media ? { id: media.id, url: media.url, alt: media.alt || '' } : null );
+	function updateCell( rowIndex, key, value ) {
+		updateRow( rowIndex, { [ key ]: value } );
 	}
+
+	function updateCellImage( rowIndex, key, media ) {
+		updateCell( rowIndex, key, media ? { id: media.id, url: media.url, alt: media.alt || '' } : null );
+	}
+
+	const focusedColumn = null !== focusedCell.colIndex ? columns[ focusedCell.colIndex ] : null;
 
 	return (
 		<>
+			{ columns.length > 0 && (
+				<TableToolbar
+					focusedCell={ focusedCell }
+					rows={ rows }
+					onInsertRowBefore={ () => insertRow( focusedCell.rowIndex ) }
+					onInsertRowAfter={ () => insertRow( focusedCell.rowIndex + 1 ) }
+					onDeleteRow={ deleteRow }
+					onToggleDivider={ toggleDivider }
+					onInsertColumnBefore={ () => insertColumn( focusedCell.colIndex ) }
+					onInsertColumnAfter={ () => insertColumn( focusedCell.colIndex + 1 ) }
+					onDeleteColumn={ deleteColumn }
+					onSetColumnType={ setColumnType }
+				/>
+			) }
+
 			<InspectorControls>
 				<PanelBody title={ __( 'Pengaturan Tabel', 'lunar-core' ) }>
 					<ToggleControl
@@ -114,91 +205,99 @@ export default function Edit( { attributes, setAttributes } ) {
 						checked={ enableFilter }
 						onChange={ ( value ) => setAttributes( { enableFilter: value } ) }
 					/>
+
+					{ focusedColumn && 'image' === focusedColumn.type && (
+						<TextControl
+							label={ __( 'Lebar Gambar — Kolom Aktif (px)', 'lunar-core' ) }
+							help={ __( 'Kolom aktif ditentukan oleh sel yang terakhir Anda klik.', 'lunar-core' ) }
+							type="number"
+							value={ focusedColumn.imageWidth ?? DEFAULT_IMAGE_WIDTH }
+							onChange={ ( value ) =>
+								setColumnImageWidth( focusedCell.colIndex, parseInt( value, 10 ) || DEFAULT_IMAGE_WIDTH )
+							}
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
 			<div { ...blockProps }>
 				{ 0 === columns.length ? (
 					<div className="lunar-table-editor__empty">
-						<p>{ __( 'Tabel masih kosong.', 'lunar-core' ) }</p>
-						<Button variant="primary" onClick={ addColumn }>
-							{ __( '+ Tambah Kolom Pertama', 'lunar-core' ) }
+						<p>{ __( 'Buat tabel baru.', 'lunar-core' ) }</p>
+						<div className="lunar-table-editor__empty-fields">
+							<TextControl
+								label={ __( 'Jumlah Kolom', 'lunar-core' ) }
+								type="number"
+								min="1"
+								value={ pendingColumnCount }
+								onChange={ setPendingColumnCount }
+							/>
+							<TextControl
+								label={ __( 'Jumlah Baris', 'lunar-core' ) }
+								type="number"
+								min="1"
+								value={ pendingRowCount }
+								onChange={ setPendingRowCount }
+							/>
+						</div>
+						<Button variant="primary" onClick={ createTable }>
+							{ __( 'Buat Tabel', 'lunar-core' ) }
 						</Button>
 					</div>
 				) : (
-					<>
-						<div className="lunar-table-editor__toolbar">
-							<Button variant="secondary" onClick={ addColumn }>
-								{ __( '+ Tambah Kolom', 'lunar-core' ) }
-							</Button>
-						</div>
-
-						<table className="lunar-table-editor__grid">
-							<thead>
-								<tr>
-									{ columns.map( ( col ) => (
-										<th key={ col.key }>
+					<table className="lunar-table-editor__grid">
+						<thead>
+							<tr>
+								{ columns.map( ( col, colIndex ) => (
+									<th key={ col.key }>
+										<TextControl
+											label={ __( 'Label kolom', 'lunar-core' ) }
+											hideLabelFromVision
+											placeholder={ __( 'Label kolom', 'lunar-core' ) }
+											value={ col.label }
+											onChange={ ( value ) => updateColumnLabel( colIndex, value ) }
+											onFocus={ () => setFocusedCell( { rowIndex: -1, colIndex } ) }
+										/>
+									</th>
+								) ) }
+							</tr>
+						</thead>
+						<tbody>
+							{ rows.map( ( row, rowIndex ) => (
+								<tr
+									key={ rowIndex }
+									className={ row.isDivider ? 'lunar-table-editor__row--divider' : undefined }
+								>
+									{ row.isDivider ? (
+										<td colSpan={ columns.length }>
 											<TextControl
-												label={ __( 'Label Kolom', 'lunar-core' ) }
-												value={ col.label }
-												onChange={ ( value ) => updateColumn( col.key, { label: value } ) }
+												label={ __( 'Teks pembagi', 'lunar-core' ) }
+												hideLabelFromVision
+												placeholder={ __( 'Teks pembagi…', 'lunar-core' ) }
+												value={ row.dividerLabel ?? '' }
+												onChange={ ( value ) => updateRow( rowIndex, { dividerLabel: value } ) }
+												onFocus={ () => setFocusedCell( { rowIndex, colIndex: null } ) }
 											/>
-											<SelectControl
-												label={ __( 'Tipe', 'lunar-core' ) }
-												value={ col.type }
-												options={ COLUMN_TYPES }
-												onChange={ ( value ) => updateColumnType( col.key, value ) }
-											/>
-											{ 'image' === col.type && (
-												<TextControl
-													label={ __( 'Lebar Gambar (px)', 'lunar-core' ) }
-													type="number"
-													value={ col.imageWidth ?? DEFAULT_IMAGE_WIDTH }
-													onChange={ ( value ) =>
-														updateColumn( col.key, {
-															imageWidth: parseInt( value, 10 ) || DEFAULT_IMAGE_WIDTH,
-														} )
-													}
-												/>
-											) }
-											<Button
-												onClick={ () => removeColumn( col.key ) }
-												isDestructive
-												isSmall
-											>
-												{ __( 'Hapus', 'lunar-core' ) }
-											</Button>
-										</th>
-									) ) }
-								</tr>
-							</thead>
-							<tbody>
-								{ rows.map( ( row, index ) => (
-									<tr key={ index } className={ row.isDivider ? 'lunar-table-editor__row--divider' : undefined }>
-										{ row.isDivider ? (
-											<td colSpan={ columns.length }>
-												<TextControl
-													label={ __( 'Teks Pembagi (melebar penuh)', 'lunar-core' ) }
-													value={ row.dividerLabel ?? '' }
-													onChange={ ( value ) => updateRow( index, { dividerLabel: value } ) }
-												/>
-											</td>
-										) : (
-											columns.map( ( col ) => (
-												<td key={ col.key }>
-													{ 'image' === col.type && (
-														<MediaUploadCheck>
-															<MediaUpload
-																onSelect={ ( media ) => updateCellImage( index, col.key, media ) }
-																allowedTypes={ [ 'image' ] }
-																value={ row[ col.key ]?.id }
-																render={ ( { open } ) =>
-																	row[ col.key ]?.url ? (
+										</td>
+									) : (
+										columns.map( ( col, colIndex ) => (
+											<td key={ col.key }>
+												{ 'image' === col.type && (
+													<MediaUploadCheck>
+														<MediaUpload
+															onSelect={ ( media ) => updateCellImage( rowIndex, col.key, media ) }
+															allowedTypes={ [ 'image' ] }
+															value={ row[ col.key ]?.id }
+															render={ ( { open } ) => (
+																<div onFocus={ () => setFocusedCell( { rowIndex, colIndex } ) }>
+																	{ row[ col.key ]?.url ? (
 																		<div className="lunar-table-editor__image-cell">
 																			<img
 																				src={ row[ col.key ].url }
 																				alt=""
-																				style={ { width: ( col.imageWidth || DEFAULT_IMAGE_WIDTH ) + 'px' } }
+																				style={ {
+																					width: ( col.imageWidth || DEFAULT_IMAGE_WIDTH ) + 'px',
+																				} }
 																			/>
 																			<Button variant="link" onClick={ open } isSmall>
 																				{ __( 'Ganti', 'lunar-core' ) }
@@ -207,7 +306,7 @@ export default function Edit( { attributes, setAttributes } ) {
 																				variant="link"
 																				isDestructive
 																				isSmall
-																				onClick={ () => updateCellImage( index, col.key, null ) }
+																				onClick={ () => updateCellImage( rowIndex, col.key, null ) }
 																			>
 																				{ __( 'Hapus Gambar', 'lunar-core' ) }
 																			</Button>
@@ -216,52 +315,41 @@ export default function Edit( { attributes, setAttributes } ) {
 																		<Button variant="secondary" isSmall onClick={ open }>
 																			{ __( 'Pilih Gambar', 'lunar-core' ) }
 																		</Button>
-																	)
-																}
-															/>
-														</MediaUploadCheck>
-													) }
-
-													{ 'number' === col.type && (
-														<TextControl
-															type="number"
-															value={ row[ col.key ] ?? '' }
-															onChange={ ( value ) => updateCell( index, col.key, value ) }
+																	) }
+																</div>
+															) }
 														/>
-													) }
+													</MediaUploadCheck>
+												) }
 
-													{ 'text' === col.type && (
-														<TextareaControl
-															value={ row[ col.key ] ?? '' }
-															onChange={ ( value ) => updateCell( index, col.key, value ) }
-															rows={ 2 }
-														/>
-													) }
-												</td>
-											) )
-										) }
-										<td className="lunar-table-editor__row-actions">
-											<ToggleControl
-												label={ __( 'Baris pembagi', 'lunar-core' ) }
-												checked={ !! row.isDivider }
-												onChange={ ( value ) => updateRow( index, { isDivider: value } ) }
-											/>
-											<Button
-												onClick={ () => removeRow( index ) }
-												isDestructive
-												isSmall
-											>
-												{ __( 'Hapus', 'lunar-core' ) }
-											</Button>
-										</td>
-									</tr>
-								) ) }
-							</tbody>
-						</table>
-						<Button variant="secondary" onClick={ addRow }>
-							{ __( '+ Tambah Baris', 'lunar-core' ) }
-						</Button>
-					</>
+												{ 'number' === col.type && (
+													<TextControl
+														label={ __( 'Nilai sel', 'lunar-core' ) }
+														hideLabelFromVision
+														type="number"
+														value={ row[ col.key ] ?? '' }
+														onChange={ ( value ) => updateCell( rowIndex, col.key, value ) }
+														onFocus={ () => setFocusedCell( { rowIndex, colIndex } ) }
+													/>
+												) }
+
+												{ 'text' === col.type && (
+													<TextareaControl
+														label={ __( 'Nilai sel', 'lunar-core' ) }
+														hideLabelFromVision
+														value={ row[ col.key ] ?? '' }
+														onChange={ ( value ) => updateCell( rowIndex, col.key, value ) }
+														onFocus={ () => setFocusedCell( { rowIndex, colIndex } ) }
+														rows={ 2 }
+													/>
+												) }
+											</td>
+										) )
+									) }
+								</tr>
+							) ) }
+						</tbody>
+					</table>
 				) }
 			</div>
 		</>
