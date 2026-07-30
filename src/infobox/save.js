@@ -1,6 +1,12 @@
 /**
  * Lokasi: lunar-core/src/infobox/save.js
  * Markup statis block induk Infobox.
+ *
+ * Refactor styling (lihat Refactor_Proposal_Lunar_Infobox.md):
+ * pembungkus InnerBlocks diubah dari <div> menjadi <dl>, karena tiap
+ * anak (infobox-item) sekarang merender pasangan <dt>/<dd> langsung
+ * (lihat item/save.js) — <dl> adalah elemen semantik yang tepat untuk
+ * membungkus daftar pasangan label-nilai tersebut.
  */
 
 import { useBlockProps, useInnerBlocksProps, RichText } from '@wordpress/block-editor';
@@ -34,7 +40,7 @@ export default function save( { attributes } ) {
 				<RichText.Content tagName={ nameTagName } className="lunar-infobox__name" value={ name } />
 			</div>
 
-			<div { ...innerBlocksProps } />
+			<dl { ...innerBlocksProps } />
 		</div>
 	);
 }
