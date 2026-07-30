@@ -4,12 +4,17 @@
  * (label manual) atau "Dikenali" (label tetap dari 5 field yang
  * disepakati, otomatis tersinkron ke post meta lewat PHP saat disimpan).
  *
- * Refactor styling (lihat Refactor_Proposal_Lunar_Infobox.md):
- * markup diubah dari <div><span><span> menjadi pasangan <dt>/<dd>,
- * selaras dengan save.js. useBlockProps() dipasang pada <dt> sebagai
- * anchor block (baik lewat RichText tagName="dt" saat mode Bebas,
- * maupun elemen <dt> polos saat mode Dikenali karena labelnya tidak
- * dapat diedit langsung).
+ * Catatan penting (bug fix pasca-refactor pertama, lihat
+ * Refactor_Proposal_Lunar_Infobox.md): blockProps HARUS dipasang pada
+ * satu elemen pembungkus yang stabil (bukan langsung pada salah satu
+ * RichText), karena block ini punya 2 RichText bersaudara (Label &
+ * Value). Menempelkan blockProps langsung ke RichText Label
+ * menyebabkan WordPress menganggap Label sebagai anchor fokus utama
+ * block, sehingga fokus "lompat" kembali ke Label setiap kali mengetik
+ * di Value. Wrapper di sini diberi "display:contents" (lihat
+ * editor.scss) supaya tidak merusak layout grid dt/dd di
+ * .lunar-infobox__fields — wrapper ini HANYA ada di editor, save.js
+ * (frontend) tetap merender dt/dd tanpa wrapper sama sekali.
  */
 
 import { __ } from '@wordpress/i18n';
@@ -21,10 +26,8 @@ export default function Edit( { attributes, setAttributes } ) {
 	const { mode, label, recognizedField, value } = attributes;
 	const isRecognized = mode === 'dikenali';
 
-	const dtProps = useBlockProps( {
-		className: isRecognized
-			? 'lunar-infobox-field__label lunar-infobox-field__label--recognized'
-			: 'lunar-infobox-field__label',
+	const blockProps = useBlockProps( {
+		className: 'lunar-infobox-field',
 	} );
 
 	const recognizedLabel = getRecognizedLabel( recognizedField ) || __( '— Pilih field —', 'lunar-core' );
@@ -60,26 +63,30 @@ export default function Edit( { attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			{ isRecognized ? (
-				<dt { ...dtProps }>{ recognizedLabel }</dt>
-			) : (
-				<RichText
-					tagName="dt"
-					{ ...dtProps }
-					placeholder={ __( 'Label…', 'lunar-core' ) }
-					value={ label }
-					onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
-					allowedFormats={ [] }
-				/>
-			) }
+			<div { ...blockProps }>
+				{ isRecognized ? (
+					<dt className="lunar-infobox-field__label lunar-infobox-field__label--recognized">
+						{ recognizedLabel }
+					</dt>
+				) : (
+					<RichText
+						tagName="dt"
+						className="lunar-infobox-field__label"
+						placeholder={ __( 'Label…', 'lunar-core' ) }
+						value={ label }
+						onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
+						allowedFormats={ [] }
+					/>
+				) }
 
-			<RichText
-				tagName="dd"
-				className="lunar-infobox-field__value"
-				placeholder={ __( 'Nilai…', 'lunar-core' ) }
-				value={ value }
-				onChange={ ( newValue ) => setAttributes( { value: newValue } ) }
-			/>
+				<RichText
+					tagName="dd"
+					className="lunar-infobox-field__value"
+					placeholder={ __( 'Nilai…', 'lunar-core' ) }
+					value={ value }
+					onChange={ ( newValue ) => setAttributes( { value: newValue } ) }
+				/>
+			</div>
 		</>
 	);
 }
