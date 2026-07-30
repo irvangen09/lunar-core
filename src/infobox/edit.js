@@ -2,6 +2,10 @@
  * Lokasi: lunar-core/src/infobox/edit.js
  * Tampilan editor block induk Infobox — gambar utama, nama, dan
  * InnerBlocks berisi field-field (hanya menerima "Infobox Field").
+ *
+ * Refactor styling (lihat Refactor_Proposal_Lunar_Infobox.md):
+ * pembungkus InnerBlocks diubah dari <div> menjadi <dl>, selaras
+ * dengan save.js dan markup dt/dd yang direnderkan tiap infobox-item.
  */
 
 import { __ } from '@wordpress/i18n';
@@ -137,7 +141,7 @@ export default function Edit( { attributes, setAttributes } ) {
 					/>
 				</div>
 
-				<div { ...innerBlocksProps } />
+				<dl { ...innerBlocksProps } />
 			</div>
 		</>
 	);
