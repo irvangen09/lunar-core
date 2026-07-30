@@ -4,6 +4,16 @@
  *
  * style.scss (frontend) tetap ikut dimuat di editor oleh WordPress,
  * file ini hanya berisi penyesuaian yang spesifik konteks editor.
+ *
+ * Refactor (lihat Refactor_Proposal_Lunar_Infobox.md):
+ * - Selector penyesuaian spacing dipindah dari wrapper lama
+ *   ".lunar-infobox-field" (sudah dihapus, lihat item/edit.js) ke
+ *   ".lunar-infobox-field__label"/"__value" langsung, karena kini
+ *   dt/dd tidak lagi punya wrapper bersama.
+ * - Override italic pada "--recognized" dihapus — pembedaan visual
+ *   Recognized Field kini sudah cukup lewat warna+tipografi di
+ *   style.scss (dimuat otomatis juga di editor), tidak perlu
+ *   penambahan lagi supaya tidak tampak dobel/ganjil.
  */
 
 .lunar-infobox__media {
@@ -28,18 +38,16 @@
 	opacity: 0.75;
 }
 
-.lunar-infobox-field {
-	// Beri jarak agar toolbar block anak (drag handle, tombol hapus)
-	// tidak berhimpitan dengan teks label/nilai.
-	padding-block: 2px;
+// Beri jarak vertikal sedikit lebih besar dibanding frontend, supaya
+// toolbar block anak (drag handle, tombol hapus) tidak berhimpitan
+// dengan teks label/nilai.
+.lunar-infobox-field__label,
+.lunar-infobox-field__value {
+	padding-block: 10px;
+}
 
-	&__label[data-rich-text-placeholder]::before,
-	&__value[data-rich-text-placeholder]::before {
-		color: var( --color-text-muted, #6b5d46 );
-		opacity: 0.75;
-	}
-
-	&__label--recognized {
-		font-style: italic;
-	}
+.lunar-infobox-field__label[data-rich-text-placeholder]::before,
+.lunar-infobox-field__value[data-rich-text-placeholder]::before {
+	color: var( --color-text-muted, #6b5d46 );
+	opacity: 0.75;
 }
