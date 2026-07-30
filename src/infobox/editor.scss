@@ -6,14 +6,17 @@
  * file ini hanya berisi penyesuaian yang spesifik konteks editor.
  *
  * Refactor (lihat Refactor_Proposal_Lunar_Infobox.md):
- * - Selector penyesuaian spacing dipindah dari wrapper lama
- *   ".lunar-infobox-field" (sudah dihapus, lihat item/edit.js) ke
- *   ".lunar-infobox-field__label"/"__value" langsung, karena kini
- *   dt/dd tidak lagi punya wrapper bersama.
- * - Override italic pada "--recognized" dihapus — pembedaan visual
- *   Recognized Field kini sudah cukup lewat warna+tipografi di
- *   style.scss (dimuat otomatis juga di editor), tidak perlu
- *   penambahan lagi supaya tidak tampak dobel/ganjil.
+ * - ".lunar-infobox-field" kembali dipakai sebagai wrapper stabil
+ *   anchor blockProps di item/edit.js (lihat komentar di file itu
+ *   untuk alasan bug fokus). "display:contents" membuat wrapper ini
+ *   transparan secara layout, sehingga dt/dd di dalamnya tetap
+ *   dianggap anak langsung grid ".lunar-infobox__fields" oleh
+ *   browser — wrapper ini HANYA ada di editor, tidak pernah muncul
+ *   di frontend (save.js tidak memilikinya sama sekali).
+ * - Recognized Field dikembalikan ke gaya italic (permintaan
+ *   eksplisit setelah revisi pertama) — khusus tampilan editor,
+ *   berbeda dari frontend (style.scss) yang memakai warna aksen +
+ *   uppercase.
  */
 
 .lunar-infobox__media {
@@ -38,16 +41,20 @@
 	opacity: 0.75;
 }
 
-// Beri jarak vertikal sedikit lebih besar dibanding frontend, supaya
-// toolbar block anak (drag handle, tombol hapus) tidak berhimpitan
-// dengan teks label/nilai.
-.lunar-infobox-field__label,
-.lunar-infobox-field__value {
-	padding-block: 10px;
+// Wrapper anchor blockProps (lihat item/edit.js) — transparan secara
+// layout supaya tidak merusak grid dt/dd milik parent.
+.lunar-infobox-field {
+	display: contents;
 }
 
 .lunar-infobox-field__label[data-rich-text-placeholder]::before,
 .lunar-infobox-field__value[data-rich-text-placeholder]::before {
 	color: var( --color-text-muted, #6b5d46 );
 	opacity: 0.75;
+}
+
+// Kembali ke gaya italic khusus editor untuk Recognized Field
+// (permintaan eksplisit) — tidak memengaruhi tampilan frontend.
+.lunar-infobox-field__label--recognized {
+	font-style: italic;
 }
