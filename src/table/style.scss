@@ -165,9 +165,7 @@
 		&::before {
 			content: attr( data-label );
 			display: block;
-			margin-bottom: 4px;
-			padding-bottom: 2px;
-			border-bottom: 2px solid var( --color-accent, #b2512e );
+			margin-bottom: 2px;
 
 			font-family: var( --font-display, serif );
 			font-size: 0.72rem;
@@ -178,15 +176,17 @@
 		}
 	}
 
-	// Divider tidak ikut berbentuk "card" seperti baris data — cukup
-	// jadi label section yang MENEMPEL ke grup baris berikutnya (sudut
-	// atas membulat, sudut bawah lurus), bukan kotak terpisah yang
-	// mengambang di antara dua grup. Jarak cuma diberi di atas Divider
-	// (pemisah dari grup sebelumnya), bukan di bawahnya.
+	// Divider tidak ikut berbentuk "card" terpisah seperti baris data,
+	// tapi tetap diberi border (kecuali sisi bawah) supaya jelas terlihat
+	// sebagai BAGIAN dari tabel — bukan teks mengambang begitu saja.
+	// Sisi bawah sengaja tanpa border supaya menyatu langsung dengan
+	// baris pertama grup berikutnya (border atas baris itu yang jadi
+	// garis pemisahnya, bukan garis ganda).
 	.lunar-table__table tr.lunar-table__row--divider {
 		display: block;
 		background: none;
-		border: none;
+		border: 1px solid var( --color-border, #d9cbaa );
+		border-bottom: none;
 		margin-top: 14px;
 		margin-bottom: 0;
 	}
@@ -196,8 +196,6 @@
 		width: 100%;
 		border-top-left-radius: var( --radius-card, 8px );
 		border-top-right-radius: var( --radius-card, 8px );
-		border-bottom-left-radius: 0;
-		border-bottom-right-radius: 0;
 
 		&::before {
 			content: none;
