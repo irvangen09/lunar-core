@@ -5,6 +5,17 @@
  * Catatan: posisi float-kanan + sticky adalah tanggung jawab Theme
  * (Fase 4), BUKAN di sini — lihat Dokumen-Perencanaan-LunarThemes.md §3.3.
  * File ini hanya mengatur tampilan "kartu"-nya sendiri.
+ *
+ * Refactor (lihat Refactor_Proposal_Lunar_Infobox.md):
+ * 1. Portrait diberi padding + background agar ada ruang napas di
+ *    antara gambar dan frame (poin 1).
+ * 2. Field kini <dt>/<dd> langsung di dalam <dl> (bukan <div> per
+ *    baris) — grid diterapkan pada <dl>, align-items:start menjaga
+ *    label tetap nempel atas meski value multi-baris (poin 2).
+ * 3. Recognized Field dibedakan lewat warna + tipografi label, tetap
+ *    dalam format tabel (bukan badge terpisah) — lihat pembahasan
+ *    poin 3 proposal (poin 3).
+ * 4. Header judul jadi rata tengah (poin 4).
  */
 
 .lunar-infobox {
@@ -21,23 +32,30 @@
 .lunar-infobox__media {
 	overflow: hidden;
 	text-align: center;
+
+	// Poin 1 — ruang napas antara gambar & frame, alih-alih gambar
+	// memenuhi penuh area media.
+	padding: 20px;
+	background: var( --color-surface-2, #f7f1e4 );
 }
 
 .lunar-infobox__media img {
 	display: block;
 	width: 100%;
 	height: auto;
-	max-height: 420px;
+	max-height: 360px;
 	object-fit: contain;
 	margin: 0 auto;
 }
 
 .lunar-infobox__header {
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 8px;
 
+	gap: 8px;
 	padding: 14px 16px 8px;
+	text-align: center;
 }
 
 .lunar-infobox__icon {
@@ -55,19 +73,28 @@
 	line-height: 1.25;
 }
 
+// Poin 2 — <dl> membungkus pasangan <dt>/<dd>. Grid auto-flow bawaan
+// menyusun dt/dd berselang-seling ke 2 kolom tanpa perlu wrapper per baris.
 .lunar-infobox__fields {
+	display: grid;
+	grid-template-columns: 40% 1fr;
+	align-items: start;
+
+	margin: 0;
 	border-top: 1px solid var( --color-border, #d9cbaa );
 }
 
-.lunar-infobox-field {
-	display: grid;
-	grid-template-columns: 40% 1fr;
-
+.lunar-infobox-field__label,
+.lunar-infobox-field__value {
+	margin: 0;
 	border-top: 1px solid var( --color-border, #d9cbaa );
+}
 
-	&:first-child {
-		border-top: none;
-	}
+// Pasangan dt/dd pertama tidak butuh border-top ganda dengan
+// .lunar-infobox__fields di atasnya.
+.lunar-infobox-field__label:first-child,
+.lunar-infobox-field__label:first-child + .lunar-infobox-field__value {
+	border-top: none;
 }
 
 .lunar-infobox-field__label {
@@ -77,6 +104,16 @@
 	color: var( --color-text-muted, #6b5d46 );
 	font-weight: 600;
 	font-size: 0.82rem;
+}
+
+// Poin 3 — Recognized Field dibedakan lewat warna aksen + tipografi
+// kecil-uppercase, menandakan field ini tersinkron ke filter pencarian,
+// tanpa mengubahnya jadi badge terpisah (tetap format tabel).
+.lunar-infobox-field__label--recognized {
+	color: var( --color-accent-secondary, #4b6b43 );
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
 }
 
 .lunar-infobox-field__value {
