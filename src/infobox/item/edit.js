@@ -3,6 +3,13 @@
  * Tampilan editor untuk satu Infobox Field — bisa mode "Bebas"
  * (label manual) atau "Dikenali" (label tetap dari 5 field yang
  * disepakati, otomatis tersinkron ke post meta lewat PHP saat disimpan).
+ *
+ * Refactor styling (lihat Refactor_Proposal_Lunar_Infobox.md):
+ * markup diubah dari <div><span><span> menjadi pasangan <dt>/<dd>,
+ * selaras dengan save.js. useBlockProps() dipasang pada <dt> sebagai
+ * anchor block (baik lewat RichText tagName="dt" saat mode Bebas,
+ * maupun elemen <dt> polos saat mode Dikenali karena labelnya tidak
+ * dapat diedit langsung).
  */
 
 import { __ } from '@wordpress/i18n';
@@ -12,9 +19,12 @@ import { RECOGNIZED_FIELDS, getRecognizedLabel } from './recognized-fields';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { mode, label, recognizedField, value } = attributes;
+	const isRecognized = mode === 'dikenali';
 
-	const blockProps = useBlockProps( {
-		className: 'lunar-infobox-field',
+	const dtProps = useBlockProps( {
+		className: isRecognized
+			? 'lunar-infobox-field__label lunar-infobox-field__label--recognized'
+			: 'lunar-infobox-field__label',
 	} );
 
 	const recognizedLabel = getRecognizedLabel( recognizedField ) || __( '— Pilih field —', 'lunar-core' );
@@ -50,30 +60,26 @@ export default function Edit( { attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...blockProps }>
-				{ mode === 'dikenali' ? (
-					<span className="lunar-infobox-field__label lunar-infobox-field__label--recognized">
-						{ recognizedLabel }
-					</span>
-				) : (
-					<RichText
-						tagName="span"
-						className="lunar-infobox-field__label"
-						placeholder={ __( 'Label…', 'lunar-core' ) }
-						value={ label }
-						onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
-						allowedFormats={ [] }
-					/>
-				) }
-
+			{ isRecognized ? (
+				<dt { ...dtProps }>{ recognizedLabel }</dt>
+			) : (
 				<RichText
-					tagName="span"
-					className="lunar-infobox-field__value"
-					placeholder={ __( 'Nilai…', 'lunar-core' ) }
-					value={ value }
-					onChange={ ( newValue ) => setAttributes( { value: newValue } ) }
+					tagName="dt"
+					{ ...dtProps }
+					placeholder={ __( 'Label…', 'lunar-core' ) }
+					value={ label }
+					onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
+					allowedFormats={ [] }
 				/>
-			</div>
+			) }
+
+			<RichText
+				tagName="dd"
+				className="lunar-infobox-field__value"
+				placeholder={ __( 'Nilai…', 'lunar-core' ) }
+				value={ value }
+				onChange={ ( newValue ) => setAttributes( { value: newValue } ) }
+			/>
 		</>
 	);
 }
