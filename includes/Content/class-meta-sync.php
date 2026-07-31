@@ -71,7 +71,9 @@ class Meta_Sync {
 	 * Field bermode "dikenali" beserta nilainya.
 	 *
 	 * @param string $post_content Konten post (format block markup).
-	 * @return array<string, string> Key = recognizedField, value = teks polos.
+	 * @return array<string, string> Key = slug field (hasil resolusi Term ID
+	 *                                lewat Meta_Fields::get_slug_by_term_id()),
+	 *                                value = teks polos.
 	 */
 	private function extract_recognized_values( string $post_content ): array {
 		$blocks  = parse_blocks( $post_content );
@@ -94,10 +96,16 @@ class Meta_Sync {
 				continue; // Field mode "bebas" tidak di-sync — sesuai desain.
 			}
 
-			$field_key = $attrs['recognizedField'] ?? '';
+			$term_id = (int) ( $attrs['recognizedField'] ?? 0 );
 
-			if ( ! in_array( $field_key, Meta_Fields::get_recognized_fields(), true ) ) {
-				continue; // Nilai tidak dikenali -> abaikan (fail gracefully).
+			if ( $term_id <= 0 ) {
+				continue; // Belum ada field dipilih di Inspector -> abaikan.
+			}
+
+			$field_key = Meta_Fields::get_slug_by_term_id( $term_id );
+
+			if ( null === $field_key ) {
+				continue; // Term sudah dihapus/tidak valid -> abaikan (fail gracefully).
 			}
 
 			$values[ $field_key ] = $this->extract_value_text( $field_block['innerHTML'] ?? '' );
@@ -124,17 +132,26 @@ class Meta_Sync {
 	}
 
 	/**
-	 * Mengambil teks polos dari markup <span class="lunar-infobox-field__value">.
+	 * Mengambil teks polos dari markup <dd class="lunar-infobox-field__value">.
 	 *
 	 * Sengaja pakai regex sederhana, BUKAN HTML parser penuh — karena
 	 * markup ini sudah pasti berasal dari save.js kita sendiri (Tahap 3.6),
 	 * bukan HTML pihak ketiga yang perlu ditangani secara umum/defensif.
 	 *
+	 * Catatan perbaikan bug (refactor decoupling, sesi ini): regex ini
+	 * sebelumnya masih mencari tag <span>, padahal markup sudah berubah
+	 * jadi <dd> sejak refactor styling Infobox. Akibatnya, setiap artikel
+	 * yang disimpan ulang setelah refactor tersebut gagal ter-sync -- regex
+	 * tidak pernah cocok, nilai dianggap kosong, dan meta lama justru ikut
+	 * terhapus lewat delete_post_meta() di sync(). Ditemukan lewat
+	 * pengecekan langsung ke save.js saat menelusuri dampak refactor Term ID
+	 * ini terhadap filter pencarian, bukan bagian dari rencana Tugas semula.
+	 *
 	 * @param string $html innerHTML block Infobox Field.
 	 * @return string Teks polos (tag format seperti bold/italic dibuang).
 	 */
 	private function extract_value_text( string $html ): string {
-		if ( preg_match( '/<span[^>]*class="[^"]*lunar-infobox-field__value[^"]*"[^>]*>(.*?)<\/span>/s', $html, $matches ) ) {
+		if ( preg_match( '/<dd[^>]*class="[^"]*lunar-infobox-field__value[^"]*"[^>]*>(.*?)<\/dd>/s', $html, $matches ) ) {
 			return trim( wp_strip_all_tags( $matches[1] ) );
 		}
 
