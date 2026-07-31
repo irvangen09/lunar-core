@@ -27,8 +27,16 @@ class Post_Types {
 	/**
 	 * Slug CPT. Dipakai class lain (mis. Taxonomies, Meta_Fields)
 	 * lewat get_slug() supaya tidak ada string literal berulang.
+	 *
+	 * Catatan migrasi: slug ini sebelumnya "wiki_artikel" (Bahasa
+	 * Indonesia). Diganti ke Bahasa Inggris sebagai bagian dari refactor
+	 * decoupling LunarCore <-> LunarThemes (Lunar_Core_Themes_Decoupling_Proposal.md
+	 * §8) — supaya identifier struktural konsisten dengan konvensi
+	 * internasional yang lebih umum dipakai komunitas WordPress, terlepas
+	 * dari label tampilan ("Wiki Artikel" di bawah) yang tetap Bahasa
+	 * Indonesia sesuai audiens pengelola situs.
 	 */
-	private const SLUG = 'wiki_artikel';
+	private const SLUG = 'wiki_article';
 
 	/**
 	 * Mendaftarkan hook WordPress.
