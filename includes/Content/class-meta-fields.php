@@ -2,8 +2,11 @@
 /**
  * Lokasi: lunar-core/includes/Content/class-meta-fields.php
  *
- * Registrasi 5 post meta field yang di-sync dari Infobox Field
- * mode "Dikenali" (Dokumen-Perencanaan-LunarThemes.md §3.4).
+ * Registrasi post meta field yang di-sync dari Infobox Field mode
+ * "Dikenali" (Dokumen-Perencanaan-LunarThemes.md §3.4). Sejak refactor
+ * decoupling (Lunar_Core_Themes_Decoupling_Proposal.md §9), daftar field
+ * tidak lagi tetap berjumlah 5 -- diambil dinamis dari taxonomy Field
+ * (wiki_field), sehingga bisa bertambah/berkurang kapan pun lewat wp-admin.
  *
  * Sengaja dipisah dari class Meta_Sync — class ini HANYA bertanggung
  * jawab mendaftarkan field-nya (agar muncul di REST API, punya
@@ -24,21 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Meta_Fields {
 
 	/**
-	 * Daftar key field yang dikenali sistem (Dokumen Perencanaan §3.4).
-	 * Sengaja TIDAK termasuk "Game" — Game sudah punya taxonomy sendiri,
-	 * lihat pembahasan sebelum Tahap Tugas Infobox dimulai.
-	 *
-	 * PENTING — kamus ini juga punya salinan terpisah di sisi JS:
-	 * src/infobox/item/recognized-fields.js (RECOGNIZED_FIELDS).
-	 * Menambah/mengubah slug di sini TIDAK otomatis tersinkron ke JS —
-	 * slug di kedua tempat wajib diperbarui bersamaan secara manual.
-	 * Ini keterbatasan yang disengaja (save.js Gutenberg harus tetap
-	 * berjalan sinkron/pure function, tidak boleh memanggil REST API),
-	 * bukan sesuatu yang terlewat.
-	 */
-	private const FIELDS = array( 'peran', 'tier_alat', 'musim', 'waktu_muncul', 'jenis_hasil' );
-
-	/**
 	 * Prefix meta key, mengikuti konvensi LunarCore (BLUEPRINT.md §12).
 	 */
 	private const META_PREFIX = 'lunar_core_';
@@ -53,14 +41,20 @@ class Meta_Fields {
 	/**
 	 * Mendaftarkan seluruh meta field lewat register_post_meta().
 	 *
-	 * Catatan: object_subtype kini diikat ke CPT "Wiki Artikel"
-	 * (Post_Types::get_slug()) — sebelumnya dikosongkan ('') karena CPT
-	 * tersebut belum dibangun. Field ini sekarang hanya berlaku untuk
-	 * Wiki Artikel, tidak lagi ke semua post type (lebih ketat & sesuai
-	 * maksud aslinya, Dokumen Perencanaan §3.4).
+	 * Daftar field diambil dinamis dari taxonomy Field (lihat
+	 * get_recognized_fields() di bawah) setiap kali "init" berjalan --
+	 * bukan lagi array PHP statis. Konsekuensinya: field baru yang
+	 * ditambahkan pengelola lewat wp-admin baru terdaftar sebagai post
+	 * meta pada request berikutnya (bukan langsung saat term dibuat),
+	 * karena register_post_meta() sendiri memang wajib dipanggil ulang
+	 * tiap request lewat hook "init" -- ini konsekuensi normal WordPress
+	 * Meta API, bukan keterbatasan khusus pendekatan ini.
+	 *
+	 * Catatan: object_subtype tetap diikat ke CPT "Wiki Artikel"
+	 * (Post_Types::get_slug()), tidak berubah dari implementasi sebelumnya.
 	 */
 	public function register_fields(): void {
-		foreach ( self::FIELDS as $field ) {
+		foreach ( self::get_recognized_fields() as $field ) {
 			register_post_meta(
 				Post_Types::get_slug(),
 				self::META_PREFIX . $field,
@@ -78,24 +72,77 @@ class Meta_Fields {
 	}
 
 	/**
-	 * Daftar key field yang dikenali — dipakai Meta_Sync untuk validasi
-	 * (mencegah nilai recognizedField sembarangan dari post_content
-	 * dianggap valid tanpa pengecekan).
+	 * Daftar slug field yang dikenali sistem -- dipakai Meta_Sync untuk
+	 * validasi dan oleh public-api.php (lunar_core_get_recognized_fields())
+	 * untuk dikonsumsi LunarThemes (filter pencarian, dst).
+	 *
+	 * Sejak refactor decoupling (Lunar_Core_Themes_Decoupling_Proposal.md §9),
+	 * daftar ini dibaca dari taxonomy Field (wiki_field), BUKAN lagi array
+	 * PHP statis -- pengelola situs bisa menambah/mengubah/menghapus field
+	 * kapan pun lewat wp-admin tanpa perlu deploy kode baru.
+	 *
+	 * PENTING: signature dan bentuk return (array of string) SENGAJA tidak
+	 * berubah dari implementasi sebelumnya -- ini kontrak publik yang sudah
+	 * dikonsumsi LunarThemes (search-filters.php) berbasis slug string,
+	 * bukan Term ID. Lihat get_slug_by_term_id() di bawah untuk resolusi
+	 * Term ID, yang merupakan kebutuhan internal terpisah (block Infobox
+	 * Field), bukan bagian dari kontrak ini.
 	 *
 	 * @return string[]
 	 */
 	public static function get_recognized_fields(): array {
-		return self::FIELDS;
+		$terms = get_terms(
+			array(
+				'taxonomy'   => Taxonomies::get_slug_field(),
+				'hide_empty' => false,
+			)
+		);
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array(); // Fail gracefully -- taxonomy belum terdaftar/kosong.
+		}
+
+		return wp_list_pluck( $terms, 'slug' );
 	}
 
 	/**
-	 * Mengubah key field (mis. "musim") jadi nama meta key lengkap
-	 * (mis. "lunar_core_musim"). Return null kalau key tidak dikenali.
+	 * Mengubah slug field (mis. "role") jadi nama meta key lengkap
+	 * (mis. "lunar_core_role"). Return null kalau slug tidak dikenali
+	 * (bukan/tidak lagi term valid di taxonomy Field).
 	 *
-	 * @param string $field Key field, salah satu dari self::FIELDS.
+	 * @param string $field Slug field, salah satu dari get_recognized_fields().
 	 * @return string|null
 	 */
 	public static function get_meta_key( string $field ): ?string {
-		return in_array( $field, self::FIELDS, true ) ? self::META_PREFIX . $field : null;
+		return in_array( $field, self::get_recognized_fields(), true ) ? self::META_PREFIX . $field : null;
+	}
+
+	/**
+	 * Resolusi Term ID (nilai attribute "recognizedField" di block Infobox
+	 * Field sejak refactor decoupling §9) menjadi slug field.
+	 *
+	 * Method ini SENGAJA hanya dipakai secara internal oleh Meta_Sync --
+	 * TIDAK diekspos lewat public-api.php. Kontrak publik untuk LunarThemes
+	 * (get_recognized_fields()/get_meta_key() di atas) tetap sepenuhnya
+	 * berbasis slug string, tidak pernah perlu tahu soal Term ID -- Term ID
+	 * murni detail implementasi block Infobox Field, konsisten dengan
+	 * BLUEPRINT.md §14 (Theme tidak bergantung pada implementasi internal
+	 * plugin).
+	 *
+	 * @param int $term_id Term ID dari taxonomy Field.
+	 * @return string|null Slug, atau null kalau term tidak ditemukan/sudah dihapus.
+	 */
+	public static function get_slug_by_term_id( int $term_id ): ?string {
+		if ( $term_id <= 0 ) {
+			return null;
+		}
+
+		$term = get_term( $term_id, Taxonomies::get_slug_field() );
+
+		if ( ! ( $term instanceof \WP_Term ) ) {
+			return null; // Term tidak valid/sudah dihapus -- fail gracefully.
+		}
+
+		return $term->slug;
 	}
 }
