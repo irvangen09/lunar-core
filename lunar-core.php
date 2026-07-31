@@ -22,6 +22,7 @@ use Lunar\Content\Taxonomies;
 use Lunar\Content\Game_Menu_Meta;
 use Lunar\Content\Game_Tile_Meta;
 use Lunar\Content\Update_Notes_Meta;
+use Lunar\Content\Field_Terms_Seeder;
 use Lunar\Content\Meta_Fields;
 use Lunar\Content\Meta_Sync;
 use Lunar\Users\Author_Fields;
@@ -84,6 +85,9 @@ function bootstrap(): void {
 
 	$taxonomies = new Taxonomies();
 	$taxonomies->init();
+
+	$field_terms_seeder = new Field_Terms_Seeder();
+	$field_terms_seeder->init();
 
 	$game_menu_meta = new Game_Menu_Meta();
 	$game_menu_meta->init();
