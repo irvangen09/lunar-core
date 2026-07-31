@@ -23,6 +23,8 @@
  * @package Lunar\Core
  */
 
+use Lunar\Content\Post_Types;
+use Lunar\Content\Taxonomies;
 use Lunar\Content\Meta_Fields;
 use Lunar\Content\Game_Menu_Meta;
 use Lunar\Content\Game_Tile_Meta;
@@ -109,4 +111,77 @@ function lunar_core_get_game_tile_url_meta_key(): string {
  */
 function lunar_core_get_game_tile_image_meta_key(): string {
 	return Game_Tile_Meta::get_image_meta_key();
+}
+
+/**
+ * ---------------------------------------------------------------------
+ * Fungsi identitas struktural (Lunar_Core_Themes_Decoupling_Proposal.md §6.1)
+ *
+ * Empat fungsi di bawah ini BARU ditambahkan sebagai bagian dari refactor
+ * decoupling LunarCore <-> LunarThemes. Tujuannya supaya LunarThemes tidak
+ * lagi menuliskan slug CPT/taxonomy secara literal ("wiki_artikel",
+ * "tipe_konten", dst) di kode manapun -- lihat BLUEPRINT.md §14-16.
+ * ---------------------------------------------------------------------
+ */
+
+/**
+ * Slug CPT Wiki Artikel.
+ *
+ * Menggantikan seluruh literal 'wiki_article' (dahulu 'wiki_artikel')
+ * yang sebelumnya ditulis langsung di LunarThemes.
+ *
+ * @return string
+ */
+function lunar_core_get_post_type_slug(): string {
+	return Post_Types::get_slug();
+}
+
+/**
+ * Slug taxonomy Game.
+ *
+ * Nilainya kebetulan sudah Bahasa Inggris sejak awal ('game'), tapi tetap
+ * diekspos di sini supaya LunarThemes tidak perlu menulis literal string
+ * apa pun untuk taxonomy ini juga -- konsisten dengan prinsip yang sama
+ * yang berlaku untuk taxonomy Tipe Konten di bawah.
+ *
+ * @return string
+ */
+function lunar_core_get_taxonomy_slug_game(): string {
+	return Taxonomies::get_slug_game();
+}
+
+/**
+ * Slug taxonomy Tipe Konten.
+ *
+ * Menggantikan seluruh literal 'content_type' (dahulu 'tipe_konten')
+ * yang sebelumnya ditulis langsung di LunarThemes.
+ *
+ * @return string
+ */
+function lunar_core_get_taxonomy_slug_content_type(): string {
+	return Taxonomies::get_slug_content_type();
+}
+
+/**
+ * Memeriksa apakah sebuah post adalah Wiki Artikel.
+ *
+ * Menggantikan pola `is_singular( 'wiki_artikel' )` / perbandingan
+ * `get_post_type() === 'wiki_artikel'` yang sebelumnya tersebar di
+ * beberapa file LunarThemes (author-query.php, enqueue.php,
+ * breadcrumb.php, game-context.php, dst) -- Theme cukup memanggil fungsi
+ * ini tanpa perlu tahu literal slug CPT sama sekali.
+ *
+ * @param int|\WP_Post|null $post Post ID, object WP_Post, atau null untuk
+ *                                 memakai global $post (post yang sedang
+ *                                 di-loop/ditampilkan saat ini).
+ * @return bool
+ */
+function lunar_core_is_wiki_article( $post = null ): bool {
+	$post = get_post( $post );
+
+	if ( ! ( $post instanceof \WP_Post ) ) {
+		return false; // Fail gracefully -- tidak ada post yang valid.
+	}
+
+	return Post_Types::get_slug() === $post->post_type;
 }
