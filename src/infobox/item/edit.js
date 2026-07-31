@@ -1,8 +1,8 @@
 /**
  * Lokasi: lunar-core/src/infobox/item/edit.js
  * Tampilan editor untuk satu Infobox Field — bisa mode "Bebas"
- * (label manual) atau "Dikenali" (label tetap dari 5 field yang
- * disepakati, otomatis tersinkron ke post meta lewat PHP saat disimpan).
+ * (label manual) atau "Dikenali" (field dipilih dari taxonomy Field,
+ * otomatis tersinkron ke post meta lewat PHP saat disimpan).
  *
  * Catatan penting (bug fix pasca-refactor pertama, lihat
  * Refactor_Proposal_Lunar_Infobox.md): blockProps HARUS dipasang pada
@@ -15,22 +15,60 @@
  * editor.scss) supaya tidak merusak layout grid dt/dd di
  * .lunar-infobox__fields — wrapper ini HANYA ada di editor, save.js
  * (frontend) tetap merender dt/dd tanpa wrapper sama sekali.
+ *
+ * Catatan refactor decoupling (Lunar_Core_Themes_Decoupling_Proposal.md §9):
+ * daftar field "Dikenali" TIDAK lagi berasal dari kamus statis
+ * (recognized-fields.js, sudah dihapus) — sekarang diambil lewat REST
+ * dari taxonomy "wiki_field", supaya pengelola situs bisa menambah field
+ * baru kapan pun lewat wp-admin tanpa perlu update kode. Attribute
+ * "recognizedField" menyimpan Term ID (bukan lagi slug string), dan
+ * "recognizedFieldLabel" menyimpan nama term saat dipilih — disimpan
+ * terpisah supaya save.js (yang wajib pure function, tidak boleh
+ * memanggil REST) tetap bisa merender label tanpa perlu resolusi apa pun.
  */
 
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, RichText, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, RadioControl, SelectControl } from '@wordpress/components';
-import { RECOGNIZED_FIELDS, getRecognizedLabel } from './recognized-fields';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+const FIELD_TAXONOMY = 'wiki_field';
 
 export default function Edit( { attributes, setAttributes } ) {
-	const { mode, label, recognizedField, value } = attributes;
+	const { mode, label, recognizedField, recognizedFieldLabel, value } = attributes;
 	const isRecognized = mode === 'dikenali';
 
 	const blockProps = useBlockProps( {
 		className: 'lunar-infobox-field',
 	} );
 
-	const recognizedLabel = getRecognizedLabel( recognizedField ) || __( '— Pilih field —', 'lunar-core' );
+	const { fieldTerms, isLoadingTerms } = useSelect( ( select ) => {
+		const query = { per_page: -1, hide_empty: false };
+		const { getEntityRecords, isResolving } = select( coreStore );
+
+		return {
+			fieldTerms: getEntityRecords( 'taxonomy', FIELD_TAXONOMY, query ) || [],
+			isLoadingTerms: isResolving( 'getEntityRecords', [ 'taxonomy', FIELD_TAXONOMY, query ] ),
+		};
+	}, [] );
+
+	const fieldOptions = [
+		{ label: __( '— Pilih —', 'lunar-core' ), value: 0 },
+		...fieldTerms.map( ( term ) => ( { label: term.name, value: term.id } ) ),
+	];
+
+	const handleFieldChange = ( newValue ) => {
+		const newTermId = Number( newValue );
+		const matchedTerm = fieldTerms.find( ( term ) => term.id === newTermId );
+
+		setAttributes( {
+			recognizedField: newTermId,
+			recognizedFieldLabel: matchedTerm ? matchedTerm.name : '',
+		} );
+	};
+
+	const displayLabel = recognizedFieldLabel || __( '— Pilih field —', 'lunar-core' );
 
 	return (
 		<>
@@ -53,11 +91,13 @@ export default function Edit( { attributes, setAttributes } ) {
 						<SelectControl
 							label={ __( 'Field', 'lunar-core' ) }
 							value={ recognizedField }
-							options={ [
-								{ label: __( '— Pilih —', 'lunar-core' ), value: '' },
-								...RECOGNIZED_FIELDS,
-							] }
-							onChange={ ( newField ) => setAttributes( { recognizedField: newField } ) }
+							options={ fieldOptions }
+							onChange={ handleFieldChange }
+							help={
+								isLoadingTerms
+									? __( 'Memuat daftar field…', 'lunar-core' )
+									: undefined
+							}
 						/>
 					) }
 				</PanelBody>
@@ -66,7 +106,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<div { ...blockProps }>
 				{ isRecognized ? (
 					<dt className="lunar-infobox-field__label lunar-infobox-field__label--recognized">
-						{ recognizedLabel }
+						{ displayLabel }
 					</dt>
 				) : (
 					<RichText
