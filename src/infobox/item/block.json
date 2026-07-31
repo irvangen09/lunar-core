@@ -18,6 +18,10 @@
 			"default": ""
 		},
 		"recognizedField": {
+			"type": "number",
+			"default": 0
+		},
+		"recognizedFieldLabel": {
 			"type": "string",
 			"default": ""
 		},
