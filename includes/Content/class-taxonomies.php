@@ -29,8 +29,30 @@ class Taxonomies {
 
 	/**
 	 * Slug taxonomy Tipe Konten.
+	 *
+	 * Catatan migrasi: slug ini sebelumnya "tipe_konten" (Bahasa
+	 * Indonesia). Diganti ke Bahasa Inggris sebagai bagian dari refactor
+	 * decoupling LunarCore <-> LunarThemes (Lunar_Core_Themes_Decoupling_Proposal.md
+	 * §8). Rewrite slug URL publik ("tipe-konten", lihat register_tipe_konten())
+	 * SENGAJA TIDAK ikut diubah pada refactor ini — itu keputusan terpisah
+	 * dengan implikasi SEO/redirect tersendiri, di luar cakupan §8 yang
+	 * murni soal identifier teknis internal.
 	 */
-	private const SLUG_TIPE_KONTEN = 'tipe_konten';
+	private const SLUG_CONTENT_TYPE = 'content_type';
+
+	/**
+	 * Slug taxonomy Field (dahulu kamus recognized-field hardcode di
+	 * Meta_Fields — lihat Lunar_Core_Themes_Decoupling_Proposal.md §9).
+	 *
+	 * Sengaja TIDAK public/publicly_queryable — taxonomy ini murni untuk
+	 * kebutuhan internal (sumber data dropdown Inspector Infobox Field +
+	 * kamus valid untuk Meta_Sync), tidak pernah dimaksudkan punya
+	 * halaman archive sendiri. Mendaftarkannya sebagai public akan
+	 * menghasilkan URL archive kosong secara SEO (mis. /wiki_field/role/)
+	 * tanpa manfaat apa pun bagi pembaca — risiko thin/duplicate content
+	 * yang sengaja dihindari sejak tahap Konsep.
+	 */
+	private const SLUG_FIELD = 'wiki_field';
 
 	/**
 	 * Mendaftarkan hook WordPress.
@@ -40,11 +62,12 @@ class Taxonomies {
 	}
 
 	/**
-	 * Mendaftarkan kedua taxonomy.
+	 * Mendaftarkan seluruh taxonomy.
 	 */
 	public function register(): void {
 		$this->register_game();
-		$this->register_tipe_konten();
+		$this->register_content_type();
+		$this->register_field();
 	}
 
 	/**
@@ -102,7 +125,7 @@ class Taxonomies {
 	 * (parent/child) untuk taxonomy ini, hierarchical => true murni untuk
 	 * UI-nya saja.
 	 */
-	private function register_tipe_konten(): void {
+	private function register_content_type(): void {
 		$labels = array(
 			'name'          => __( 'Tipe Konten', 'lunar-core' ),
 			'singular_name' => __( 'Tipe Konten', 'lunar-core' ),
@@ -114,7 +137,7 @@ class Taxonomies {
 		);
 
 		register_taxonomy(
-			self::SLUG_TIPE_KONTEN,
+			self::SLUG_CONTENT_TYPE,
 			array( Post_Types::get_slug() ),
 			array(
 				'labels'            => $labels,
@@ -128,6 +151,55 @@ class Taxonomies {
 					'slug'       => 'tipe-konten',
 					'with_front' => false,
 				),
+			)
+		);
+	}
+
+	/**
+	 * Taxonomy "Field" (dahulu recognized-field hardcode, mis. "Peran",
+	 * "Tier Alat") — dikelola bebas oleh pengelola situs lewat wp-admin,
+	 * tanpa perlu deploy kode untuk menambah/mengubah/menghapus field
+	 * (Lunar_Core_Themes_Decoupling_Proposal.md §9).
+	 *
+	 * Catatan keputusan:
+	 * - non-hierarchical (flat, seperti Tag) — field-field ini tidak
+	 *   punya relasi parent-child satu sama lain, berbeda dari taxonomy
+	 *   Game yang memang butuh struktur Franchise > Judul Spesifik.
+	 * - public => false & publicly_queryable => false — lihat penjelasan
+	 *   di komentar SLUG_FIELD di atas.
+	 * - show_in_rest => true tetap wajib meski tidak public — ini yang
+	 *   memungkinkan dropdown Inspector block Infobox Field mengambil
+	 *   daftar term terkini lewat @wordpress/core-data, pola yang sama
+	 *   seperti dropdown Category/Tag bawaan Gutenberg.
+	 * - Term awal ("Role") di-seed otomatis oleh Field_Terms_Seeder saat
+	 *   plugin diaktifkan/diperbarui — lihat class-field-terms-seeder.php
+	 *   (Tugas 4.3), TIDAK didaftarkan manual di sini supaya class ini
+	 *   tetap murni definisi struktur taxonomy (konsisten dengan alasan
+	 *   term meta menu-per-game dipisah dari register_game()).
+	 */
+	private function register_field(): void {
+		$labels = array(
+			'name'          => __( 'Field', 'lunar-core' ),
+			'singular_name' => __( 'Field', 'lunar-core' ),
+			'search_items'  => __( 'Cari Field', 'lunar-core' ),
+			'all_items'     => __( 'Semua Field', 'lunar-core' ),
+			'edit_item'     => __( 'Edit Field', 'lunar-core' ),
+			'add_new_item'  => __( 'Tambah Field Baru', 'lunar-core' ),
+			'menu_name'     => __( 'Field', 'lunar-core' ),
+		);
+
+		register_taxonomy(
+			self::SLUG_FIELD,
+			array( Post_Types::get_slug() ),
+			array(
+				'labels'             => $labels,
+				'hierarchical'       => false,
+				'public'             => false,
+				'publicly_queryable' => false,
+				'show_ui'            => true,
+				'show_admin_column'  => false,
+				'show_in_rest'       => true,
+				'query_var'          => false,
 			)
 		);
 	}
@@ -147,7 +219,18 @@ class Taxonomies {
 	 *
 	 * @return string
 	 */
-	public static function get_slug_tipe_konten(): string {
-		return self::SLUG_TIPE_KONTEN;
+	public static function get_slug_content_type(): string {
+		return self::SLUG_CONTENT_TYPE;
+	}
+
+	/**
+	 * Slug taxonomy Field — dipakai Meta_Fields untuk membaca daftar
+	 * recognized-field terkini (Tugas 4.4) dan Meta_Sync untuk resolusi
+	 * Term ID -> slug saat menyimpan artikel (Tugas 4.5).
+	 *
+	 * @return string
+	 */
+	public static function get_slug_field(): string {
+		return self::SLUG_FIELD;
 	}
 }

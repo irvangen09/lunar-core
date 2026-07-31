@@ -171,7 +171,7 @@ class Game_Menu_Meta {
 	 */
 	public function register_translatable( array $taxonomies ): array {
 		$taxonomies[] = Taxonomies::get_slug_game();
-		$taxonomies[] = Taxonomies::get_slug_tipe_konten();
+		$taxonomies[] = Taxonomies::get_slug_content_type();
 
 		return array_unique( $taxonomies );
 	}
