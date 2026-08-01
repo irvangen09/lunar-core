@@ -33,10 +33,10 @@ class Taxonomies {
 	 * Catatan migrasi: slug ini sebelumnya "tipe_konten" (Bahasa
 	 * Indonesia). Diganti ke Bahasa Inggris sebagai bagian dari refactor
 	 * decoupling LunarCore <-> LunarThemes (Lunar_Core_Themes_Decoupling_Proposal.md
-	 * §8). Rewrite slug URL publik ("tipe-konten", lihat register_tipe_konten())
-	 * SENGAJA TIDAK ikut diubah pada refactor ini — itu keputusan terpisah
-	 * dengan implikasi SEO/redirect tersendiri, di luar cakupan §8 yang
-	 * murni soal identifier teknis internal.
+	 * §8). Rewrite slug URL publik SUDAH ikut diubah ke Bahasa Inggris
+	 * ("content-type", lihat register_content_type()) sesuai permintaan
+	 * lanjutan Product Owner supaya seluruh slug publik konsisten
+	 * berbahasa universal — bukan lagi pengecualian seperti draf §8 awal.
 	 */
 	private const SLUG_CONTENT_TYPE = 'content_type';
 
@@ -148,7 +148,7 @@ class Taxonomies {
 				'show_in_rest'      => true,
 				'query_var'         => true,
 				'rewrite'           => array(
-					'slug'       => 'tipe-konten',
+					'slug'       => 'content-type',
 					'with_front' => false,
 				),
 			)
