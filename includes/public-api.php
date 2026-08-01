@@ -55,6 +55,19 @@ function lunar_core_get_field_meta_key( string $field ): ?string {
 }
 
 /**
+ * Label tampilan asli untuk sebuah slug field-sync (mis. "role" ->
+ * "Role") -- diambil dari nama term taxonomy Field, bukan kamus statis.
+ * Ditambahkan sebagai bagian dari refactor decoupling (§9) supaya
+ * LunarThemes tidak perlu memelihara kamus label sendiri.
+ *
+ * @param string $field Key field, salah satu dari lunar_core_get_recognized_fields().
+ * @return string
+ */
+function lunar_core_get_field_label( string $field ): string {
+	return Meta_Fields::get_label( $field );
+}
+
+/**
  * Role/jabatan penulis untuk Author Box LunarThemes.
  *
  * @param int $user_id ID user.

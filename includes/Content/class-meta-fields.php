@@ -118,6 +118,33 @@ class Meta_Fields {
 	}
 
 	/**
+	 * Label tampilan asli untuk sebuah slug field -- diambil dari nama
+	 * term taxonomy Field (persis seperti yang diketik pengelola di
+	 * wp-admin), BUKAN kamus statis terpisah.
+	 *
+	 * Method ini sengaja dibangun supaya LunarThemes tidak perlu menyimpan
+	 * kamus labelnya sendiri (yang akan mengulang persis masalah yang baru
+	 * saja diselesaikan di sisi LunarCore, Lunar_Core_Themes_Decoupling_Proposal.md
+	 * §9 -- kamus statis yang gampang lupa disinkronkan begitu field baru
+	 * ditambahkan). Sejak fungsi ini ada, LunarThemes cukup memanggilnya,
+	 * tidak perlu mendefinisikan label field apa pun sendiri.
+	 *
+	 * @param string $field Slug field, salah satu dari get_recognized_fields().
+	 * @return string Nama term asli, atau versi title-case dari slug kalau
+	 *                term tidak ditemukan (fail gracefully -- field yang
+	 *                sudah dihapus/tidak dikenali tetap dapat label yang wajar).
+	 */
+	public static function get_label( string $field ): string {
+		$term = get_term_by( 'slug', $field, Taxonomies::get_slug_field() );
+
+		if ( $term instanceof \WP_Term ) {
+			return $term->name;
+		}
+
+		return ucwords( str_replace( array( '_', '-' ), ' ', $field ) );
+	}
+
+	/**
 	 * Resolusi Term ID (nilai attribute "recognizedField" di block Infobox
 	 * Field sejak refactor decoupling §9) menjadi slug field.
 	 *
