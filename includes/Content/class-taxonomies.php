@@ -51,6 +51,17 @@ class Taxonomies {
 	 * menghasilkan URL archive kosong secara SEO (mis. /wiki_field/role/)
 	 * tanpa manfaat apa pun bagi pembaca — risiko thin/duplicate content
 	 * yang sengaja dihindari sejak tahap Konsep.
+	 *
+	 * PENTING (ditemukan lewat pengujian staging): register_field() TIDAK
+	 * mengikat taxonomy ini ke CPT manapun (object_type dikosongkan) --
+	 * mengikatnya ke Wiki Artikel membuat Gutenberg otomatis merender
+	 * panel taxonomy generik di sidebar Block Editor (terpisah dari
+	 * dropdown Inspector milik block Infobox Field sendiri), yang
+	 * membuka celah pengelola tidak sengaja membuat & meng-assign term
+	 * langsung dari panel itu (bukan lewat block Infobox Field yang
+	 * dimaksud). Dropdown Inspector tetap berfungsi normal tanpa binding
+	 * ini karena ia fetch lewat endpoint term (/wp/v2/wiki_field)
+	 * langsung, tidak bergantung pada relasi taxonomy<->CPT.
 	 */
 	private const SLUG_FIELD = 'wiki_field';
 
@@ -190,7 +201,7 @@ class Taxonomies {
 
 		register_taxonomy(
 			self::SLUG_FIELD,
-			array( Post_Types::get_slug() ),
+			array(), // Sengaja TIDAK diikat ke CPT manapun -- lihat catatan di atas class SLUG_FIELD.
 			array(
 				'labels'             => $labels,
 				'hierarchical'       => false,
