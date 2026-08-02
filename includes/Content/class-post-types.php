@@ -87,7 +87,7 @@ class Post_Types {
 				'show_in_menu'       => true,
 				'show_in_rest'       => true,
 				'menu_icon'          => 'dashicons-book-alt',
-				'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+				'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ),
 				'has_archive'        => false,
 				'query_var'          => true,
 				'capability_type'    => 'post',
