@@ -176,6 +176,21 @@ function lunar_core_get_taxonomy_slug_content_type(): string {
 }
 
 /**
+ * Slug taxonomy Field ("wiki_field").
+ *
+ * Taxonomy ini murni internal (lihat catatan public: false di
+ * class-taxonomies.php) dan tidak pernah dimaksudkan diakses lewat URL
+ * publik apa pun -- fungsi ini diekspos supaya LunarThemes bisa mengenali
+ * slug-nya untuk kebutuhan seperti guard 404 eksplisit, tanpa perlu
+ * menulis literal 'wiki_field' sendiri.
+ *
+ * @return string
+ */
+function lunar_core_get_taxonomy_slug_field(): string {
+	return Taxonomies::get_slug_field();
+}
+
+/**
  * Memeriksa apakah sebuah post adalah Wiki Artikel.
  *
  * Menggantikan pola `is_singular( 'wiki_artikel' )` / perbandingan
